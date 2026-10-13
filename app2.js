@@ -1,44 +1,5 @@
 'use strict';
-/* ===== إصلاح: دالة يوم الأسبوع للرقم التسلسلي ===== */
-function dowOf(s){return new Date(s*864e5).getUTCDay();}
-
-/* ===== نسخة مصححة من شريط اليوم — تُلغي النسخة المعطوبة في app1.js ===== */
-function renderToday(){
-  const T=todayParts();
-  const ts=serial(T.y,T.m,T.d),baseS=baseSerial();
-  const licSet=licEdit?licPicked:licenses;
-  tDateEl.textContent=DOW_FULL[dowOf(ts)]+' '+arNum(T.d)+' '+MONTH_AR[T.m]+' '+arNum(T.y);
-  if(!state){
-    tBadgeEl.innerHTML='<span class="badge none">لم يُحدد الجدول بعد</span>';
-    tNextEl.textContent='اضغط «تعديل أيام العمل» ثم اختر ٣ أيام متتالية — ويتحسب كل شيء تلقائياً';
-    weekEl.innerHTML='';
-    return;
-  }
-  const off=mod6(ts-baseS);
-  const ws=[...state.offsets].sort((a,b)=>a-b);
-  const rs=[0,1,2,3,4,5].filter(o=>!ws.includes(o));
-  const isW=ws.includes(off);
-  if(licSet.has(ts)){
-    tBadgeEl.innerHTML='<span class="badge lic">رخصة / إجازة معتمدة</span>';
-  }else{
-    tBadgeEl.innerHTML=isW
-      ?'<span class="badge work">يوم عمل '+arNum(ws.indexOf(off)+1)+' من '+arNum(ws.length)+'</span>'
-      :'<span class="badge rest">يوم إجازة '+arNum(rs.indexOf(off)+1)+' من '+arNum(rs.length)+'</span>';
-  }
-  let nx=0;
-  for(let k=1;k<=6;k++){const o=mod6(off+k);if(isW?!ws.includes(o):ws.includes(o)){nx=k;break;}}
-  tNextEl.innerHTML=(isW?'الإجازة القادمة بعد ':'العمل القادم بعد ')+daysPhrase(nx)
-    +(licSet.has(ts)?' · <span style="color:var(--lic-ink)">اليوم من أيام رخصتك — لا تذكير دعاء اليوم</span>':'');
-  let h='';
-  for(let k=-3;k<=3;k++){
-    const s2=ts+k;
-    const kind=licSet.has(s2)?'lic':(ws.includes(mod6(s2-baseS))?'work':'rest');
-    h+='<div class="wd '+kind+(k===0?' now':'')+'"><i></i><span>'+(k===0?'اليوم':DOW[dowOf(s2)])+'</span></div>';
-  }
-  weekEl.innerHTML=h;
-}
-
-/* ===== موعد التذكير القادم ===== */
+/* ===== موعد التذكير القادم (مُصلَّح: استخدام dowOf) ===== */
 function nextDuaInfo(){
   if(!state)return null;
   const ts=todaySerial();

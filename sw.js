@@ -1,4 +1,4 @@
-const CAconst CACHE='twq-cal-v4';
+const CACHE='twq-cal-v5';
 const CORE=['./','./index.html','./manifest.json','./icon.svg','./style.css','./app1.js','./app2.js'];
 
 self.addEventListener('install',e=>{
@@ -24,12 +24,16 @@ self.addEventListener('fetch',e=>{
     );
     return;
   }
+  /* ملفات الكود: الشبكة أولاً حتى تصل التحديثات فوراً — والذاكرة احتياط عند انقطاع النت */
   e.respondWith(
-    caches.match(e.request,{ignoreSearch:true}).then(hit=>hit||fetch(e.request).then(res=>{
-      if(res.ok&&e.request.url.indexOf(location.origin)===0){
-        const cp=res.clone();caches.open(CACHE).then(c=>c.put(e.request,cp));
-      }
-      return res;
-    }))
+    fetch(e.request)
+      .then(res=>{
+        if(res.ok){
+          const cp=res.clone();
+          caches.open(CACHE).then(c=>c.put(e.request,cp));
+        }
+        return res;
+      })
+      .catch(()=>caches.match(e.request,{ignoreSearch:true}))
   );
 });

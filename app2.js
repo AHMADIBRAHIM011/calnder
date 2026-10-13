@@ -2,7 +2,7 @@
 /* ===== إصلاح: دالة يوم الأسبوع للرقم التسلسلي ===== */
 function dowOf(s){return new Date(s*864e5).getUTCDay();}
 
-/* ===== نسخة مصححة من شريط اليوم — تُلغي النسخة المعطوبة في app1.js ===== */
+/* ===== نسخة مصححة من شريط اليوم ===== */
 function renderToday(){
   const T=todayParts();
   const ts=serial(T.y,T.m,T.d),baseS=baseSerial();

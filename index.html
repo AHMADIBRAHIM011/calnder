@@ -14,6 +14,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Reem+Kufi:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+/* مراقب الأخطاء: يعرض أي خطأ بالسكربت على الشاشة مباشرة */
+window.addEventListener('error',function(e){
+  try{
+    var t=document.getElementById('toast');
+    if(t){t.textContent='⚠️ خطأ سطر '+e.lineno+': '+e.message;t.classList.add('show');}
+  }catch(_){}
+});
+</script>
 <style>
 :root{
   --bg:#060606; --panel:#0c0c0a; --line:#1d1b15; --line2:#2b2820;
@@ -27,7 +36,6 @@
 body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:13px;line-height:1.7;-webkit-font-smoothing:antialiased}
 button{font-family:inherit}
 
-/* ===== الشريط العلوي ===== */
 .top{position:sticky;top:0;z-index:40;background:rgba(6,6,6,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .top-in{max-width:1180px;margin:0 auto;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 h1{font-family:'Reem Kufi',sans-serif;font-weight:500;font-size:21px;display:flex;align-items:center;gap:9px}
@@ -55,7 +63,6 @@ h1 em{font-style:normal;color:var(--gold)}
 .pcount{font-size:11px;color:#a89f8c;border:1px solid var(--line2);border-radius:20px;padding:0 12px;line-height:20px;min-width:56px;text-align:center}
 .spacer{flex:1}
 
-/* ===== شريط اليوم ===== */
 .todaybar{max-width:1180px;margin:16px auto 0;padding:0 18px;display:flex;gap:12px;align-items:stretch;flex-wrap:wrap}
 .tinfo{flex:1 1 380px;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .tlabel{font-size:10px;color:var(--gold);border:1px solid var(--gold-soft);border-radius:20px;padding:0 10px;line-height:20px}
@@ -76,7 +83,6 @@ h1 em{font-style:normal;color:var(--gold)}
 .wd.now i{border:2px solid var(--gold)}
 .wd.now span{color:var(--gold-ink)}
 
-/* ===== شريط الدعاء ===== */
 .duabar{max-width:1180px;margin:10px auto 0;padding:0 18px}
 .duabar-in{border:1px solid var(--gold-soft);background:linear-gradient(180deg,#100f0a,#0b0a08);border-radius:12px;padding:9px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .duabar .st{font-size:11.5px;display:inline-flex;align-items:center;gap:7px;color:#a89f8c}
@@ -89,7 +95,6 @@ h1 em{font-style:normal;color:var(--gold)}
 .duabar details div{padding-top:6px;line-height:1.9}
 .bell{color:var(--gold);flex:0 0 auto}
 
-/* ===== عدّاد الشهور ===== */
 .sumwrap{max-width:1180px;margin:14px auto 0;padding:0 18px}
 .sumhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}
 .sumtitle{font-size:11px;color:var(--dim)}
@@ -114,7 +119,6 @@ h1 em{font-style:normal;color:var(--gold)}
 .dot.l{background:var(--lic)}
 .scard.cur{border-color:var(--gold-soft)}
 
-/* ===== شبكة الشهور ===== */
 #months{max-width:1180px;margin:16px auto 0;padding:0 18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(226px,1fr));gap:14px}
 .month{border:1px solid var(--line);background:#0b0b09;border-radius:13px;padding:11px 11px 12px;transition:border-color .3s,background .3s}
 .month.cur{border-color:var(--gold-soft);background:#0e0d09}
@@ -141,7 +145,6 @@ h1 em{font-style:normal;color:var(--gold)}
 #months.licedit .cell.marked::after{content:'✓';position:absolute;top:0;inset-inline-start:5px;font-size:9px;color:#d5e5ff;line-height:1.5}
 #months.wave .cell{transition:background .55s ease,color .55s ease,border-color .55s ease}
 
-/* ===== نافذة الدعاء ===== */
 #duaOverlay{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.8);backdrop-filter:blur(7px);display:flex;align-items:center;justify-content:center;padding:16px}
 #duaOverlay[hidden]{display:none}
 .dua-card{position:relative;width:min(620px,100%);max-height:88vh;overflow-y:auto;background:linear-gradient(180deg,#12110b,#0a0a08);border:1px solid var(--gold-soft);border-radius:18px;padding:26px 22px 20px;box-shadow:0 0 0 1px rgba(0,0,0,.6),0 24px 70px rgba(0,0,0,.7);animation:duaIn .45s ease}
@@ -157,7 +160,6 @@ h1 em{font-style:normal;color:var(--gold)}
 .dua-body p{margin:0 0 11px}
 .dua-actions{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap}
 
-/* ===== التذييل والتوست ===== */
 footer{max-width:1180px;margin:20px auto 0;padding:13px 18px 34px;border-top:1px solid var(--line);color:var(--dim);font-size:11px;display:flex;gap:18px;flex-wrap:wrap;align-items:center}
 footer b{font-weight:600;color:#cfc9ba}
 footer .fr{display:inline-flex;align-items:center;gap:5px;color:#cfc9ba}
@@ -282,7 +284,7 @@ const fromSerial=s=>{const t=new Date(s*864e5);return{y:t.getUTCFullYear(),m:t.g
 const mod6=n=>((n%6)+6)%6;
 const daysPhrase=n=>n===1?'يوم واحد':n===2?'يومين':arNum(n)+' أيام';
 
-/* ============ حالة الدورة (جدول الدوام) ============ */
+/* ============ حالة الدورة ============ */
 const KEY='twq-work-calendar-3x3';
 const DEFAULT=()=>({base:{y:2026,m:9,d:1},offsets:[0,1,2]});
 let state=(()=>{try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.base&&Array.isArray(s.offsets)&&s.offsets.length===3)return s;}catch(e){}return DEFAULT();})();
@@ -316,7 +318,7 @@ const lset=(k,v)=>{try{localStorage.setItem(k,String(v));}catch(e){}};
 const todayParts=()=>{const t=new Date();return{y:t.getFullYear(),m:t.getMonth(),d:t.getDate()};};
 const todaySerial=()=>{const T=todayParts();return serial(T.y,T.m,T.d);};
 const isWorkDay=s=>classify(s)==='work';
-/* ★ يوم التذكير: دوام في الجدول وليس مسجلاً رخصة/إجازة */
+/* يوم التذكير: دوام في الجدول وليس مسجلاً رخصة/إجازة */
 const isDuaDay=s=>classify(s)==='work'&&!licenses.has(s);
 const pastDuaTime=()=>{const n=new Date();return n.getHours()*60+n.getMinutes()>=DUA_MIN;};
 
@@ -488,7 +490,7 @@ function renderToday(){
   for(let k=1;k<=6;k++){const o=mod6(off+k);if(isW?!ws.includes(o):ws.includes(o)){nx=k;break;}}
   const inRange=MONTHS.some(mo=>mo.y===T.y&&mo.m===T.m);
   tNextEl.innerHTML=(isW?'الإجازة القادمة بعد ':'العمل القادم بعد ')+daysPhrase(nx)
-    +(licSet.has(ts)?' · <span style="color:var(--lic-ink)">اليوم من أيام رخصتك المسجلة — لا تذكير دعاء اليوم</span>':'')
+    +(licSet.has(ts)?' · <span style="color:var(--lic-ink)">اليوم من أيام رخصتك — لا تذكير دعاء اليوم</span>':'')
     +(inRange?'':' <span class="warnchip">تاريخ جهازك خارج نطاق التقويم المعروض</span>');
   tDateEl.textContent=DOW_FULL[new Date(T.y,T.m,T.d).getDay()]+' '+arNum(T.d)+' '+MONTH_AR[T.m]+' '+arNum(T.y);
   let h='';
@@ -523,7 +525,6 @@ let toastT;
 function toast(msg){toastEl.textContent=msg;toastEl.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('show'),3600);}
 
 /* ============ الدعاء: موعد + إشعار + نافذة ============ */
-/* ★ موعد التذكير القادم: يتخطى الإجازات الأسبوعية وأيام الرخص المسجلة */
 function nextDuaInfo(){
   const ts=todaySerial();
   for(let k=0;k<30;k++){
@@ -553,7 +554,6 @@ function renderDuaBar(){
   if(sup==='default')acts+='<button class="btn small filled" data-act="enable">تفعيل الإشعارات</button>';
   if(sup==='granted')acts+='<button class="btn small" data-act="test">إشعار تجريبي</button>';
   acts+='<button class="btn small" data-act="open">فتح الدعاء</button>';
-  /* ★ إن كان اليوم دواماً مسجلاً رخصة → تنبيه بعدم وجود تذكير اليوم */
   const ts=todaySerial();
   const todayLic=isWorkDay(ts)&&licenses.has(ts);
   const nx=nextDuaInfo();
@@ -567,7 +567,7 @@ function renderDuaBar(){
     +'• <b>أندرويد:</b> أبقِ التطبيق مفتوحاً في الخلفية وسيصلك الإشعار في وقته.<br>'
     +'• <b>آيفون:</b> أضف التطبيق للشاشة الرئيسية عبر Safari وافتحه من الأيقونة (iOS 16.4+).<br>'
     +'• <b>الضمان الأكبر:</b> عند فتح التطبيق بعد ٤:٣٠ مساءً في ليلة عمل يظهر الدعاء تلقائياً.<br>'
-    +'• <b>أيام الرخص والإجازات:</b> إذا سجّلت يوماً دوام أصلاً كرخصة/إجازة، يُلغى تذكير ذلك اليوم تلقائياً وينتقل لأول ليلة عمل بعده.'
+    +'• <b>أيام الرخص:</b> إذا سجّلت يوماً دوام أصلاً كرخصة/إجازة، يُلغى تذكير ذلك اليوم تلقائياً.'
     +'</div></details>';
 }
 function notifyDua(){
@@ -626,7 +626,6 @@ function duaDone(){
   closeDua();
   toast('تقبّل الله طاعتك — تم تسجيل قراءة الدعاء لهذه الليلة');
 }
-/* ★ فحص التذكير: يعمل فقط في يوم دوام غير مسجل رخصة */
 function checkDuaHard(){
   renderDuaBar();
   const s=todaySerial();
@@ -715,7 +714,7 @@ setInterval(()=>{
 </script>
 
 <script>
-/* ===== أيقونة الآيفون + خدمة العمل بدون إنترنت ===== */
+/* أيقونة الآيفون + خدمة العمل بدون إنترنت */
 (function(){
   try{
     var c=document.createElement('canvas');c.width=180;c.height=180;

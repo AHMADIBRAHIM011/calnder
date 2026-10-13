@@ -1,4 +1,4 @@
-const CACHE='twq-cal-v3';
+const CAconst CACHE='twq-cal-v4';
 const CORE=['./','./index.html','./manifest.json','./icon.svg','./style.css','./app1.js','./app2.js'];
 
 self.addEventListener('install',e=>{

@@ -5,11 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#060606">
 <title>تقويم أيام العمل</title>
-<!-- ★ تطبيق شاشة رئيسية (آيفون) -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="تقويم العمل">
-<!-- ★ توليد أيقونة: تقويم + نجمة عسكرية -->
+<!-- ★ أيقونة: تقويم ذهبي على أسود مع ترقيم الأيام -->
 <script>
 try{
   var c=document.createElement('canvas');c.width=180;c.height=180;
@@ -17,13 +13,20 @@ try{
   function rr(px,py,w,h,r){x.beginPath();x.moveTo(px+r,py);x.arcTo(px+w,py,px+w,py+h,r);x.arcTo(px+w,py+h,px,py+h,r);x.arcTo(px,py+h,px,py,r);x.arcTo(px,py,px+w,py,r);x.closePath();}
   x.fillStyle='#060606';x.fillRect(0,0,180,180);
   x.fillStyle='#d9a641';
-  rr(28,44,124,112,14);x.fill();
-  x.fillStyle='#060606';rr(34,50,112,100,9);x.fill();
-  x.fillStyle='#d9a641';rr(28,44,124,30,14);x.fill();x.fillRect(28,60,124,14);
-  rr(46,26,12,28,6);x.fill();rr(122,26,12,28,6);x.fill();
-  x.fillStyle='#060606';x.fillRect(36,104,108,44);
-  function star(cx,cy,R){x.beginPath();for(var i=0;i<10;i++){var rad=i%2?R*0.42:R,a=Math.PI*i/5-Math.PI/2;x[i?'lineTo':'moveTo'](cx+rad*Math.cos(a),cy+rad*Math.sin(a));}x.closePath();x.fill();}
-  x.fillStyle='#e23d42';star(90,126,30);
+  rr(22,44,136,114,16);x.fill();
+  x.fillStyle='#060606';
+  rr(30,86,120,64,10);x.fill();
+  x.fillStyle='#d9a641';
+  rr(46,26,11,30,5);x.fill();
+  rr(123,26,11,30,5);x.fill();
+  x.font='bold 11px sans-serif';x.textAlign='center';x.textBaseline='middle';
+  var cols=[38.5,55.5,72.5,90,107.5,124.5,141.5],rows=[103,122,141];
+  for(var n=1;n<=21;n++){
+    var col=(n-1)%7,row=Math.floor((n-1)/7);
+    if(n===13){x.beginPath();x.arc(cols[col],rows[row],8.5,0,Math.PI*2);x.fill();x.fillStyle='#060606';}
+    x.fillText(String(n),cols[col],rows[row]+0.5);
+    if(n===13)x.fillStyle='#d9a641';
+  }
   var l=document.createElement('link');l.rel='apple-touch-icon';l.href=c.toDataURL('image/png');
   document.head.appendChild(l);
 }catch(e){}

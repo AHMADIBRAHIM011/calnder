@@ -1,21 +1,171 @@
 <!DOCTYPE html>
-<!-- INDEX v5 -->
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#060606">
-<meta name="mobile-web-app-capable" content="yes">
+<title>تقويم أيام العمل</title>
+<!-- ★ تطبيق شاشة رئيسية (آيفون) -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="تقويم العمل">
-<title>تقويم أيام العمل</title>
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
+<!-- ★ توليد أيقونة: تقويم + نجمة عسكرية -->
+<script>
+try{
+  var c=document.createElement('canvas');c.width=180;c.height=180;
+  var x=c.getContext('2d');
+  function rr(px,py,w,h,r){x.beginPath();x.moveTo(px+r,py);x.arcTo(px+w,py,px+w,py+h,r);x.arcTo(px+w,py+h,px,py+h,r);x.arcTo(px,py+h,px,py,r);x.arcTo(px,py,px+w,py,r);x.closePath();}
+  x.fillStyle='#060606';x.fillRect(0,0,180,180);
+  x.fillStyle='#d9a641';
+  rr(28,44,124,112,14);x.fill();
+  x.fillStyle='#060606';rr(34,50,112,100,9);x.fill();
+  x.fillStyle='#d9a641';rr(28,44,124,30,14);x.fill();x.fillRect(28,60,124,14);
+  rr(46,26,12,28,6);x.fill();rr(122,26,12,28,6);x.fill();
+  x.fillStyle='#060606';x.fillRect(36,104,108,44);
+  function star(cx,cy,R){x.beginPath();for(var i=0;i<10;i++){var rad=i%2?R*0.42:R,a=Math.PI*i/5-Math.PI/2;x[i?'lineTo':'moveTo'](cx+rad*Math.cos(a),cy+rad*Math.sin(a));}x.closePath();x.fill();}
+  x.fillStyle='#e23d42';star(90,126,30);
+  var l=document.createElement('link');l.rel='apple-touch-icon';l.href=c.toDataURL('image/png');
+  document.head.appendChild(l);
+}catch(e){}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Reem+Kufi:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<style>
+:root{
+  --bg:#060606; --panel:#0c0c0a; --line:#1d1b15; --line2:#2b2820;
+  --ink:#e9e4d6; --dim:#8a8272; --dim2:#6b6455;
+  --gold:#d9a641; --gold-ink:#e2b95c; --gold-soft:rgba(217,166,65,.45);
+  --work:#e23d42; --work-ink:#ff7d72; --work-bg:rgba(226,61,66,.13); --work-line:rgba(226,61,66,.55);
+  --rest:#2ebb6e; --rest-ink:#55d68f; --rest-bg:rgba(46,187,110,.12); --rest-line:rgba(46,187,110,.5);
+  --lic:#3f8cff; --lic-ink:#8ab6ff; --lic-bg:rgba(63,140,255,.14); --lic-line:rgba(63,140,255,.55);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:13px;line-height:1.7;-webkit-font-smoothing:antialiased}
+button{font-family:inherit}
+.top{position:sticky;top:0;z-index:40;background:rgba(6,6,6,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-in{max-width:1180px;margin:0 auto;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+h1{font-family:'Reem Kufi',sans-serif;font-weight:500;font-size:21px;display:flex;align-items:center;gap:9px}
+h1 svg{color:var(--gold);flex:0 0 auto}
+h1 em{font-style:normal;color:var(--gold)}
+.sub{font-size:10.5px;color:var(--dim);margin-top:1px}
+.hbtns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:7px;background:none;border:1px solid var(--line2);color:#cfc9ba;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;transition:border-color .2s,color .2s,background .2s}
+.btn:hover{border-color:var(--gold);color:var(--gold-ink)}
+.btn.gold{border-color:var(--gold-soft);color:var(--gold-ink)}
+.btn.gold:hover{background:rgba(217,166,65,.08)}
+.btn.small{padding:4px 11px;font-size:11px}
+.btn.licb{border-color:rgba(63,140,255,.5);color:var(--lic-ink)}
+.btn.licb:hover{background:rgba(63,140,255,.08);border-color:var(--lic)}
+.btn.licfill{background:var(--lic);border-color:var(--lic);color:#04101f;font-weight:600}
+.btn.filled{background:var(--gold);border-color:var(--gold);color:#171204;font-weight:600}
+.dotu{width:7px;height:7px;border-radius:50%;background:var(--gold);display:none;box-shadow:0 0 6px var(--gold)}
+#duaBtn.unread .dotu{display:inline-block}
+.editbar{max-width:1180px;margin:0 auto;padding:4px 18px 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-top:1px dashed var(--line)}
+.editbar[hidden]{display:none}
+.editbar .msg{font-size:11.5px;color:var(--gold-ink)}
+.editbar.lic .msg{color:var(--lic-ink)}
+.pcount{font-size:11px;color:#a89f8c;border:1px solid var(--line2);border-radius:20px;padding:0 12px;line-height:20px;min-width:56px;text-align:center}
+.spacer{flex:1}
+.todaybar{max-width:1180px;margin:16px auto 0;padding:0 18px;display:flex;gap:12px;align-items:stretch;flex-wrap:wrap}
+.tinfo{flex:1 1 380px;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tlabel{font-size:10px;color:var(--gold);border:1px solid var(--gold-soft);border-radius:20px;padding:0 10px;line-height:20px}
+.tdate{font-size:14px;font-weight:600;letter-spacing:.2px}
+.badge{font-size:11px;border-radius:20px;padding:1px 11px;border:1px solid;white-space:nowrap}
+.badge.work{color:var(--work-ink);border-color:var(--work-line);background:var(--work-bg)}
+.badge.rest{color:var(--rest-ink);border-color:var(--rest-line);background:var(--rest-bg)}
+.badge.lic{color:var(--lic-ink);border-color:var(--lic-line);background:var(--lic-bg)}
+.tnext{font-size:11px;color:var(--dim);flex-basis:100%;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.warnchip{font-size:9.5px;color:#a89f8c;border:1px dashed var(--line2);border-radius:20px;padding:0 9px}
+.weekstrip{display:flex;gap:6px;align-items:flex-end;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:9px 12px}
+.wd{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:8.5px;color:var(--dim);min-width:34px}
+.wd i{width:100%;height:22px;border-radius:6px;border:1px solid;display:block}
+.wd.work i{background:var(--work-bg);border-color:var(--work-line)}
+.wd.rest i{background:var(--rest-bg);border-color:var(--rest-line)}
+.wd.lic i{background:var(--lic-bg);border-color:var(--lic-line)}
+.wd.now{color:var(--gold)}
+.wd.now i{border:2px solid var(--gold)}
+.wd.now span{color:var(--gold-ink)}
+.duabar{max-width:1180px;margin:10px auto 0;padding:0 18px}
+.duabar-in{border:1px solid var(--gold-soft);background:linear-gradient(180deg,#100f0a,#0b0a08);border-radius:12px;padding:7px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.duabar .st{font-size:11px;color:#a89f8c}
+.duabar .st.ok{color:var(--rest-ink)}
+.duabar .st.bad{color:var(--work-ink)}
+.duabar .st.mid{color:var(--gold-ink)}
+.sumwrap{max-width:1180px;margin:14px auto 0;padding:0 18px}
+.sumhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.sumtitle{font-size:11px;color:var(--dim)}
+.legend{display:flex;gap:14px;font-size:10.5px;color:#a89f8c;margin-inline-start:auto}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.sw{width:11px;height:11px;border-radius:3.5px;display:inline-block}
+.sw.w{background:rgba(226,61,66,.25);border:1px solid rgba(226,61,66,.7)}
+.sw.r{background:rgba(46,187,110,.25);border:1px solid rgba(46,187,110,.7)}
+.sw.l{background:rgba(63,140,255,.25);border:1px solid rgba(63,140,255,.7)}
+.sw.t{border:2px solid var(--gold)}
+.summary{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px}
+.summary::-webkit-scrollbar{height:5px}
+.summary::-webkit-scrollbar-thumb{background:#26231b;border-radius:3px}
+.scard{flex:0 0 auto;min-width:106px;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:7px 11px;transition:opacity .3s}
+.scard.dim{opacity:.5}
+.scard b{display:flex;align-items:baseline;gap:5px;font-size:12px;font-weight:600}
+.scard b i{font-style:normal;font-size:9.5px;color:var(--dim2)}
+.scard .row{display:flex;gap:10px;font-size:10.5px;color:#a89f8c;margin-top:2px;white-space:nowrap}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block;flex:0 0 auto}
+.dot.w{background:var(--work)}
+.dot.r{background:var(--rest)}
+.dot.l{background:var(--lic)}
+.scard.cur{border-color:var(--gold-soft)}
+#months{max-width:1180px;margin:16px auto 0;padding:0 18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(226px,1fr));gap:14px}
+.month{border:1px solid var(--line);background:#0b0b09;border-radius:13px;padding:11px 11px 12px;transition:border-color .3s,background .3s}
+.month.cur{border-color:var(--gold-soft);background:#0e0d09}
+.month>header{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:1px 3px 9px}
+.month h2{font-family:'Reem Kufi',sans-serif;font-weight:500;font-size:14.5px}
+.mstat{display:flex;gap:9px;font-size:10px;color:#a89f8c}
+.mstat b{font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.dow,.days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.dow span{text-align:center;font-size:9px;color:var(--dim2);padding-bottom:3px}
+.cell{aspect-ratio:1;border:1px solid transparent;border-radius:7px;background:none;color:var(--dim2);font-size:11.5px;font-weight:500;display:flex;align-items:center;justify-content:center;position:relative;padding:0;appearance:none;user-select:none;cursor:default;transition:background .3s,color .3s,border-color .3s}
+.cell.work{color:var(--work-ink);background:var(--work-bg);border-color:var(--work-line)}
+.cell.rest{color:var(--rest-ink);background:var(--rest-bg);border-color:var(--rest-line)}
+.cell.lic{color:var(--lic-ink);background:var(--lic-bg);border-color:var(--lic-line)}
+.cell.empty{pointer-events:none}
+.cell.today{border:2px solid var(--gold);animation:todayPulse 2.6s ease-in-out infinite}
+@keyframes todayPulse{0%,100%{border-color:#d9a641}50%{border-color:rgba(217,166,65,.4)}}
+#months.editing .cell:not(.empty){color:var(--dim2);background:#0a0a08;border-color:#191813;cursor:pointer}
+#months.editing .cell:not(.empty):hover{border-color:var(--gold-soft);color:#a89f8c}
+#months.editing .cell.today{border:2px solid var(--gold);background:#0d0c09;color:var(--dim2);animation:none}
+#months.editing .cell.picked{color:#fff;background:rgba(226,61,66,.22);border-color:var(--work)}
+#months.editing .cell.picked::after{content:attr(data-pick);position:absolute;top:1px;inset-inline-start:4px;font-size:8px;color:#ffb4ad;line-height:1.2}
+#months.licedit .cell:not(.empty){cursor:pointer}
+#months.licedit .cell:not(.empty):hover{border-color:var(--lic-line)}
+#months.licedit .cell.marked::after{content:'✓';position:absolute;top:0;inset-inline-start:5px;font-size:9px;color:#d5e5ff;line-height:1.5}
+#months.wave .cell{transition:background .55s ease,color .55s ease,border-color .55s ease}
+#duaOverlay{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.8);backdrop-filter:blur(7px);display:flex;align-items:center;justify-content:center;padding:16px}
+#duaOverlay[hidden]{display:none}
+.dua-card{position:relative;width:min(620px,100%);max-height:88vh;overflow-y:auto;background:linear-gradient(180deg,#12110b,#0a0a08);border:1px solid var(--gold-soft);border-radius:18px;padding:26px 22px 20px;animation:duaIn .45s ease}
+@keyframes duaIn{from{transform:translateY(16px) scale(.97);opacity:0}}
+.dua-x{position:absolute;top:10px;inset-inline-start:10px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line2);background:none;color:var(--dim);font-size:15px;cursor:pointer;line-height:1}
+.dua-head{text-align:center}
+.dua-moon{font-size:26px;color:var(--gold);display:block;line-height:1.4}
+.dua-title{font-family:'Reem Kufi',sans-serif;font-size:21px;color:var(--gold-ink);margin-top:4px}
+.dua-sub{font-size:10.5px;color:var(--dim);display:block;margin-top:3px}
+.dua-sep{width:90px;height:1px;background:linear-gradient(90deg,transparent,var(--gold-soft),transparent);margin:13px auto}
+.dua-body{font-size:13.5px;line-height:2.2;color:#efe9da;text-align:center}
+.dua-body p{margin:0 0 11px}
+.dua-actions{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+footer{max-width:1180px;margin:20px auto 0;padding:13px 18px 34px;border-top:1px solid var(--line);color:var(--dim);font-size:11px;display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+footer b{font-weight:600;color:#cfc9ba}
+footer .fr{display:inline-flex;align-items:center;gap:5px;color:#cfc9ba}
+#toast{position:fixed;bottom:22px;right:50%;transform:translate(50%,16px);background:#14120c;border:1px solid var(--gold-soft);color:var(--gold-ink);padding:8px 18px;border-radius:24px;font-size:12px;opacity:0;pointer-events:none;transition:.3s;z-index:99;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translate(50%,0)}
+@media(max-width:620px){
+  h1{font-size:17px}
+  #months{grid-template-columns:repeat(auto-fill,minmax(205px,1fr))}
+  .tinfo{flex-basis:100%}
+  .weekstrip{width:100%;justify-content:space-between}
+  .legend{margin-inline-start:0}
+}
+</style>
 </head>
 <body>
 
@@ -26,34 +176,26 @@
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 17.5h.01M12 17.5h.01"/></svg>
         تقويم <em>أيام العمل</em>
       </h1>
-      <p class="sub">دورة ٣ عمل · ٣ إجازة — الرخص والإجازات مستثناة من تذكير دعاء التحصين</p>
+      <p class="sub">دورة ٣ أيام عمل · ٣ أيام إجازة — من سبتمبر ٢٠٢٦ إلى ديسمبر ٢٠٢٧</p>
     </div>
     <div class="hbtns">
-      <button class="btn" id="duaBtn">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-        الدعاء <span class="dotu"></span>
-      </button>
-      <button class="btn licb" id="licBtn">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/><path d="M9 15l2 2 4-4"/></svg>
-        الرخص والإجازات
-      </button>
+      <button class="btn" id="duaBtn">الدعاء <span class="dotu"></span></button>
+      <button class="btn licb" id="licBtn">الرخص والإجازات</button>
       <button class="btn gold" id="editBtn">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
         تعديل أيام العمل
       </button>
     </div>
   </div>
-
   <div class="editbar" id="editBar" hidden>
-    <span class="msg">وضع التعديل — اضغط على ثلاثة أيام عمل متتالية وسيُحسب الدوام والإجازة لكامل التقويم تلقائياً.</span>
+    <span class="msg">وضع التعديل — الألوان مُسحت. اضغط على ثلاثة أيام عمل (يُفضَّل أن تكون متتالية) وسيُعاد تلوين التقويم كله تلقائيًا.</span>
     <span class="pcount" id="pcount">٠ / ٣</span>
     <span class="spacer"></span>
-    <button class="btn small" id="resetBtn">مسح الجدول</button>
+    <button class="btn small" id="resetBtn">الافتراضي: ١ أكتوبر ٢٠٢٦</button>
     <button class="btn small" id="cancelBtn">إلغاء</button>
   </div>
-
   <div class="editbar lic" id="licBar" hidden>
-    <span class="msg">وضع الرخص — اضغط أي يوم لتعيينه رخصة/إجازة، واضغط مجدداً لإلغائه. جدول الدوام لا يتغير ويُلغى تذكير الدعاء في تلك الأيام.</span>
+    <span class="msg">وضع الرخص — اضغط أي يوم لتعيينه رخصة/إجازة، واضغط مجدداً لإلغائه. جدول الدوام لا يتغير، ويُلغى تذكير الدعاء في تلك الأيام.</span>
     <span class="pcount" id="licCount">٠ يوم</span>
     <span class="spacer"></span>
     <button class="btn small" id="clearLic">مسح الكل</button>
@@ -69,7 +211,7 @@
     <span id="tBadge"></span>
     <span class="tnext" id="tNext"></span>
   </div>
-  <div class="weekstrip" id="weekStrip"></div>
+  <div class="weekstrip" id="weekStrip" title="الأسبوع من حولك"></div>
 </section>
 
 <section class="duabar">
@@ -78,7 +220,7 @@
 
 <section class="sumwrap">
   <div class="sumhead">
-    <span class="sumtitle">عدّاد الشهور — العمل والإجازة والرخص في كل شهر</span>
+    <span class="sumtitle">عدّاد الشهور — أيام العمل والإجازة في كل شهر</span>
     <div class="legend">
       <span><i class="sw w"></i>عمل</span>
       <span><i class="sw r"></i>إجازة</span>
@@ -92,6 +234,7 @@
 <main id="months"></main>
 
 <footer id="foot"></footer>
+<div id="toast" role="status"></div>
 
 <div id="duaOverlay" hidden>
   <div class="dua-card">
@@ -110,31 +253,378 @@
   </div>
 </div>
 
-<div id="toast" role="status"></div>
-<div id="bootMsg" style="position:fixed;bottom:70px;right:50%;transform:translateX(50%);background:#3a1518;border:1px solid #e23d42;color:#ffb4ad;padding:8px 16px;border-radius:20px;font-size:11px;display:none;z-index:98;max-width:90vw;text-align:center"></div>
+<script>
+'use strict';
 
-<script>
-window.onerror=function(m,u,l){var b=document.getElementById('bootMsg');b.style.display='block';b.textContent='⚠️ خطأ سطر '+l+': '+m;};
-</script>
-<script src="app1.js"></script>
-<script src="app2.js"></script>
-<script>
-setTimeout(function(){
-  var g=document.getElementById('months');
-  if(g&&g.children.length===0){
-    var b=document.getElementById('bootMsg');
-    b.style.display='block';
-    b.textContent='⚠️ ملفات التطبيق لم تُحمّل — افتح .../app1.js و .../app2.js وتأكد من أول سطر في كل ملف';
+/* ============ أدوات عامة ============ */
+const AR='٠١٢٣٤٥٦٧٨٩';
+const arNum=n=>String(n).replace(/\d/g,d=>AR[+d]);
+const MONTH_AR=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+const DOW=['أحد','اثنين','ثلاثاء','أربعاء','خميس','جمعة','سبت'];
+const DOW_FULL=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+const serial=(y,m,d)=>Math.round(Date.UTC(y,m,d)/864e5);
+const fromSerial=s=>{const t=new Date(s*864e5);return{y:t.getUTCFullYear(),m:t.getUTCMonth(),d:t.getUTCDate()};};
+const mod6=n=>((n%6)+6)%6;
+const daysPhrase=n=>n===1?'يوم واحد':n===2?'يومين':arNum(n)+' أيام';
+
+/* ============ الحالة: الدورة ============ */
+const KEY='twq-work-calendar-3x3';
+const DEFAULT=()=>({base:{y:2026,m:9,d:1},offsets:[0,1,2]});
+let state=(()=>{try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.base&&Array.isArray(s.offsets)&&s.offsets.length===3)return s;}catch(e){}return DEFAULT();})();
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}};
+const baseSerial=()=>serial(state.base.y,state.base.m,state.base.d);
+const classify=s=>state.offsets.includes(mod6(s-baseSerial()))?'work':'rest';
+
+/* ============ الرخص والإجازات ============ */
+const KEY_LIC='twq-licenses-v1';
+let licenses=(()=>{try{const a=JSON.parse(localStorage.getItem(KEY_LIC));if(Array.isArray(a))return new Set(a.filter(n=>Number.isInteger(n)));}catch(e){}return new Set();})();
+const saveLic=()=>{try{localStorage.setItem(KEY_LIC,JSON.stringify([...licenses].sort((a,b)=>a-b)));}catch(e){}};
+let licEdit=false,licPicked=new Set();
+const licSet=()=>licEdit?licPicked:licenses;
+
+/* نطاق العرض: سبتمبر ٢٠٢٦ → ديسمبر ٢٠٢٧ */
+const MONTHS=(()=>{const a=[];for(let y=2026;y<=2027;y++)for(let m=0;m<12;m++){if(y===2026&&m<8)continue;if(y===2027&&m>11)break;a.push({y,m});}return a;})();
+
+/* ============ دعاء التحصين ============ */
+const DUA_PARAS=[
+'اللهم إني أعوذ بك من ساعة السوء ويوم السوء وليلة السوء وصديق السوء وجار السوء، وأعوذ بك من ذي الوجهين وذي اللسانين، وأعوذ بك من إبليس وذريته وشياطينه، وأعوذ بك من الحديد والحريق والطريق وساعة الغفلة',
+'ربنا عليك توكلت وأنت رب العرش العظيم',
+'اللهم إني حصّنت نفسي وأهل بيتي جميعًا بالحيّ القيوم الذي لا تأخذه سنة ولا نوم، ودفعت عني وعنهم السوء بلا حول ولا قوة إلا بالله العلي العظيم',
+'اللهم إني أعوذ بك من بكاء يرهقني وهمّ يفجعني، اللهم اجبر خاطري واشرح صدري',
+'استغفرك ربي من كل الذنوب والخطايا، ربي لا تكسر لي قلبًا ولا تصعب عليّ أمرًا ولا تحرمني من تعلّقت به الروح',
+'واحفظ لي عائلتي وأحبتي، ومن أراد لي الخير يارب العالمين'];
+const DUA_TEXT=DUA_PARAS.join(' ');
+const DUA_MIN=16*60+30;
+const K_NOTIFIED='twq-dua-notified',K_READ='twq-dua-read';
+const lnum=k=>{try{const v=localStorage.getItem(k);return v===null?-1:+v;}catch(e){return -1;}};
+const lset=(k,v)=>{try{localStorage.setItem(k,String(v));}catch(e){}};
+const isDuaDay=s=>classify(s)==='work'&&!licenses.has(s);
+const pastDuaTime=()=>{const n=new Date();return n.getHours()*60+n.getMinutes()>=DUA_MIN;};
+const DUA_ICON=(()=>{try{const c=document.createElement('canvas');c.width=c.height=192;const x=c.getContext('2d');
+x.fillStyle='#0b0b09';x.fillRect(0,0,192,192);
+x.strokeStyle='#d9a641';x.lineWidth=10;x.strokeRect(10,10,172,172);
+x.fillStyle='#d9a641';x.font='110px serif';x.textAlign='center';x.textBaseline='middle';x.fillText('☾',96,104);
+return c.toDataURL('image/png');}catch(e){return undefined;}})();
+
+/* ============ العناصر ============ */
+const $=id=>document.getElementById(id);
+const monthsEl=$('months'),summaryEl=$('summary'),weekEl=$('weekStrip'),
+      tDateEl=$('tDate'),tBadgeEl=$('tBadge'),tNextEl=$('tNext'),
+      editBtn=$('editBtn'),editBar=$('editBar'),pcountEl=$('pcount'),
+      cancelBtn=$('cancelBtn'),resetBtn=$('resetBtn'),footEl=$('foot'),toastEl=$('toast'),
+      licBtn=$('licBtn'),licBar=$('licBar'),licCountEl=$('licCount'),
+      clearLicBtn=$('clearLic'),saveLicBtn=$('saveLicBtn'),cancelLicBtn=$('cancelLic'),
+      duaBtn=$('duaBtn'),duaBarEl=$('duaBar'),duaOverlay=$('duaOverlay'),
+      duaSub=$('duaSub'),duaBody=$('duaBody'),duaX=$('duaX'),duaSpeak=$('duaSpeak'),duaDoneBtn=$('duaDoneBtn');
+const BTN_HTML=editBtn.innerHTML,LIC_BTN_HTML=licBtn.innerHTML;
+
+/* ============ وضع التعديل ============ */
+let editing=false,picked=[];
+function todayParts(){const t=new Date();return{y:t.getFullYear(),m:t.getMonth(),d:t.getDate()};}
+
+/* ============ رسم الشهور ============ */
+function renderMonths(wave){
+  const T=todayParts();
+  monthsEl.classList.toggle('editing',editing);
+  monthsEl.classList.toggle('licedit',licEdit);
+  monthsEl.classList.toggle('wave',!!wave);
+  const baseS=baseSerial();
+  const LS=licSet();
+  let h='';
+  for(const mo of MONTHS){
+    const lead=new Date(mo.y,mo.m,1).getDay();
+    const dim=new Date(mo.y,mo.m+1,0).getDate();
+    const isCur=mo.y===T.y&&mo.m===T.m;
+    let w=0,r=0,l=0;
+    for(let d=1;d<=dim;d++){const s2=serial(mo.y,mo.m,d);if(LS.has(s2))l++;else if(classify(s2)==='work')w++;else r++;}
+    h+='<section class="month'+(isCur?' cur':'')+'"><header><h2>'+MONTH_AR[mo.m]+' '+arNum(mo.y)+'</h2>'
+      +'<span class="mstat"><b><i class="dot w"></i>'+arNum(w)+'</b><b><i class="dot r"></i>'+arNum(r)+'</b>'
+      +(l?'<b><i class="dot l"></i>'+arNum(l)+'</b>':'')+'</span></header>'
+      +'<div class="dow">'+DOW.map(x=>'<span>'+x+'</span>').join('')+'</div><div class="days">';
+    for(let i=0;i<lead;i++)h+='<span class="cell empty"></span>';
+    for(let d=1;d<=dim;d++){
+      const s=serial(mo.y,mo.m,d);
+      const isT=mo.y===T.y&&mo.m===T.m&&d===T.d;
+      let cls='cell',extra='',kind='';
+      if(editing){
+        const pi=picked.indexOf(s);
+        if(pi>-1){cls+=' picked';extra=' data-pick="'+arNum(pi+1)+'"';}
+      }else if(LS.has(s)){
+        cls+=' lic';kind=' — رخصة / إجازة (بلا تذكير دعاء)';
+      }else{
+        cls+=' '+classify(s);
+        kind=' — '+(classify(s)==='work'?'يوم عمل':'يوم إجازة');
+      }
+      if(licEdit&&licPicked.has(s))cls+=' marked';
+      if(isT)cls+=' today';
+      const delay=(wave&&!editing)?' style="transition-delay:'+Math.max(0,s-baseS)*1.1+'ms"':'';
+      h+='<button type="button" class="'+cls+'" data-s="'+s+'"'+extra+delay
+        +' title="'+DOW_FULL[new Date(mo.y,mo.m,d).getDay()]+' '+arNum(d)+' '+MONTH_AR[mo.m]+' '+arNum(mo.y)+kind+'"><span>'+arNum(d)+'</span></button>';
+    }
+    h+='</div></section>';
   }
-},1500);
-(function(){
-  try{var c=document.createElement('canvas');c.width=180;c.height=180;var x=c.getContext('2d');
-  x.fillStyle='#060606';x.fillRect(0,0,180,180);x.fillStyle='#d9a641';x.font='118px serif';
-  x.textAlign='center';x.textBaseline='middle';x.fillText('\u263E',90,100);
-  var l=document.createElement('link');l.rel='apple-touch-icon';l.setAttribute('sizes','180x180');
-  l.href=c.toDataURL('image/png');document.head.appendChild(l);}catch(e){}
-})();
-if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});}
+  monthsEl.innerHTML=h;
+}
+
+/* ============ عدّاد الشهور ============ */
+function renderSummary(){
+  const T=todayParts();
+  const LS=licSet();
+  let h='';
+  for(const mo of MONTHS){
+    const dim=new Date(mo.y,mo.m+1,0).getDate();
+    let w=0,r=0,l=0;
+    for(let d=1;d<=dim;d++){const s2=serial(mo.y,mo.m,d);if(LS.has(s2))l++;else if(classify(s2)==='work')w++;else r++;}
+    const isCur=mo.y===T.y&&mo.m===T.m;
+    h+='<div class="scard'+(isCur?' cur':'')+((editing||licEdit)?' dim':'')+'"><b>'+MONTH_AR[mo.m]+'<i>'+arNum(mo.y)+'</i></b>'
+      +'<span class="row"><span><i class="dot w"></i>عمل '+arNum(w)+'</span><span><i class="dot r"></i>إجازة '+arNum(r)+'</span><span><i class="dot l"></i>رخص '+arNum(l)+'</span></span></div>';
+  }
+  summaryEl.innerHTML=h;
+}
+
+/* ============ شريط اليوم + الأسبوع من حولك ============ */
+function renderToday(){
+  const T=todayParts();
+  const ts=serial(T.y,T.m,T.d),baseS=baseSerial();
+  const LS=licSet();
+  const off=mod6(ts-baseS);
+  const ws=[...state.offsets].sort((a,b)=>a-b);
+  const rs=[0,1,2,3,4,5].filter(o=>!ws.includes(o));
+  const isW=ws.includes(off);
+  if(LS.has(ts)){
+    tBadgeEl.innerHTML='<span class="badge lic">رخصة / إجازة معتمدة</span>';
+  }else{
+    tBadgeEl.innerHTML=isW
+      ?'<span class="badge work">يوم عمل '+arNum(ws.indexOf(off)+1)+' من '+arNum(ws.length)+'</span>'
+      :'<span class="badge rest">يوم إجازة '+arNum(rs.indexOf(off)+1)+' من '+arNum(rs.length)+'</span>';
+  }
+  let nx=0;
+  for(let k=1;k<=6;k++){const o=mod6(off+k);if(isW?!ws.includes(o):ws.includes(o)){nx=k;break;}}
+  const inRange=MONTHS.some(mo=>mo.y===T.y&&mo.m===T.m);
+  tNextEl.innerHTML=(isW?'الإجازة القادمة بعد ':'العمل القادم بعد ')+daysPhrase(nx)
+    +(LS.has(ts)?' · <span style="color:var(--lic-ink)">اليوم من أيام رخصتك</span>':'')
+    +(inRange?'':' <span class="warnchip">تاريخ جهازك خارج نطاق التقويم المعروض</span>');
+  tDateEl.textContent=DOW_FULL[new Date(T.y,T.m,T.d).getDay()]+' '+arNum(T.d)+' '+MONTH_AR[T.m]+' '+arNum(T.y);
+  let h='';
+  for(let k=-3;k<=3;k++){
+    const s2=ts+k;
+    const kind=LS.has(s2)?'lic':(ws.includes(mod6(s2-baseS))?'work':'rest');
+    h+='<div class="wd '+kind+(k===0?' now':'')+'"><i></i><span>'+(k===0?'اليوم':DOW[new Date(s2*864e5).getUTCDay()])+'</span></div>';
+  }
+  weekEl.innerHTML=h;
+}
+
+/* ============ التذييل ============ */
+function renderFoot(){
+  let w=0,r=0,l=0,tot=0;
+  const LS=licenses;
+  for(const mo of MONTHS){
+    const dim=new Date(mo.y,mo.m+1,0).getDate();
+    for(let d=1;d<=dim;d++){const s2=serial(mo.y,mo.m,d);tot++;if(LS.has(s2))l++;else if(classify(s2)==='work')w++;else r++;}
+  }
+  footEl.innerHTML='<span>إجمالي الفترة: <b>'+arNum(tot)+'</b> يوماً</span>'
+    +'<span class="fr"><i class="dot w"></i>أيام العمل: <b>'+arNum(w)+'</b></span>'
+    +'<span class="fr"><i class="dot r"></i>أيام الإجازة: <b>'+arNum(r)+'</b></span>'
+    +'<span class="fr"><i class="dot l"></i>رخص: <b>'+arNum(l)+'</b></span>'
+    +'<span>النمط: ٣ عمل ثم ٣ إجازة، دورة كل ٦ أيام</span>';
+}
+
+/* ============ توست ============ */
+let toastT;
+function toast(msg){toastEl.textContent=msg;toastEl.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('show'),3200);}
+
+/* ============ منطق تعديل الدوام ============ */
+function updatePcount(){pcountEl.textContent=arNum(picked.length)+' / ٣';}
+function startEdit(){
+  if(licEdit)stopLicEdit();
+  editing=true;picked=[];
+  editBar.hidden=false;
+  editBtn.textContent='إلغاء التعديل';
+  updatePcount();
+  renderMonths(false);renderSummary();
+}
+function stopEdit(){
+  editing=false;picked=[];
+  editBar.hidden=true;
+  editBtn.innerHTML=BTN_HTML;
+  renderMonths(false);renderSummary();
+}
+function finishPick(){
+  picked.sort((a,b)=>a-b);
+  const baseS=picked[0];
+  const offsets=[...new Set(picked.map(p=>mod6(p-baseS)))].sort((a,b)=>a-b);
+  state={base:fromSerial(baseS),offsets};
+  save();
+  const consecutive=picked[1]-picked[0]===1&&picked[2]-picked[1]===1;
+  editing=false;picked=[];
+  editBar.hidden=true;
+  editBtn.innerHTML=BTN_HTML;
+  renderAll(true);
+  toast(consecutive?'تم إعادة حساب أيام العمل والإجازة لكامل التقويم':'تم الحفظ — انتبه: أيام العمل التي اخترتها غير متتالية');
+}
+
+/* ============ وضع الرخص ============ */
+function startLicEdit(){
+  if(editing)stopEdit();
+  licEdit=true;
+  licPicked=new Set(licenses);
+  licBar.hidden=false;
+  licBtn.textContent='إغلاق الرخص';
+  licCountEl.textContent=arNum(licPicked.size)+' يوم';
+  renderMonths(false);renderSummary();
+}
+function stopLicEdit(){
+  licEdit=false;licPicked=new Set();
+  licBar.hidden=true;
+  licBtn.innerHTML=LIC_BTN_HTML;
+  renderMonths(false);renderSummary();
+}
+function commitLic(){
+  licenses=new Set(licPicked);
+  saveLic();
+  licEdit=false;licPicked=new Set();
+  licBar.hidden=true;
+  licBtn.innerHTML=LIC_BTN_HTML;
+  renderAll(false);
+  toast(licenses.size?'تم حفظ الرخص — '+arNum(licenses.size)+' يوماً (تذكير الدعاء مستثنى منها)':'تم مسح جميع الرخص');
+}
+
+editBtn.addEventListener('click',()=>editing?stopEdit():startEdit());
+cancelBtn.addEventListener('click',stopEdit);
+resetBtn.addEventListener('click',()=>{
+  state=DEFAULT();save();stopEdit();renderAll(true);
+  toast('استُعيد التقويم الافتراضي — بداية العمل: الخميس ١ أكتوبر ٢٠٢٦');
+});
+licBtn.addEventListener('click',()=>licEdit?stopLicEdit():startLicEdit());
+cancelLicBtn.addEventListener('click',stopLicEdit);
+saveLicBtn.addEventListener('click',commitLic);
+clearLicBtn.addEventListener('click',()=>{licPicked.clear();licCountEl.textContent='٠ يوم';renderMonths(false);renderSummary();});
+
+monthsEl.addEventListener('click',e=>{
+  const b=e.target.closest('.cell');
+  if(!b||b.classList.contains('empty'))return;
+  const s=+b.dataset.s;
+  if(licEdit){
+    licPicked.has(s)?licPicked.delete(s):licPicked.add(s);
+    licCountEl.textContent=arNum(licPicked.size)+' يوم';
+    renderMonths(false);renderSummary();
+    return;
+  }
+  if(!editing)return;
+  const i=picked.indexOf(s);
+  if(i>-1)picked.splice(i,1);else picked.push(s);
+  updatePcount();
+  if(picked.length===3)finishPick();
+  else renderMonths(false);
+});
+
+/* ============ دعاء التحصين ============ */
+function renderDuaBar(){
+  const sup=('Notification' in window)?Notification.permission:'unsupported';
+  let st,acts='';
+  if(sup==='granted'){st='<span class="st ok">الإشعارات مفعّلة ✓</span><span class="spacer"></span><button class="btn small" data-act="test">تجربة</button>';}
+  else if(sup==='denied'){st='<span class="st bad">الإشعارات مرفوضة — فعّلها من إعدادات المتصفح</span><span class="spacer"></span>';}
+  else if(sup==='unsupported'){st='<span class="st bad">متصفحك لا يدعم الإشعارات — سيظهر الدعاء تلقائياً بعد ٤:٣٠</span><span class="spacer"></span>';}
+  else{st='<span class="st mid">الإشعارات غير مفعّلة</span><span class="spacer"></span><button class="btn small filled" data-act="enable">تفعيل الإشعارات</button>';}
+  duaBarEl.innerHTML=st+'<button class="btn small" data-act="open">فتح الدعاء</button>';
+}
+function buildDuaBody(){duaBody.innerHTML=DUA_PARAS.map(p=>'<p>'+p+'</p>').join('');}
+function openDua(){
+  const T=todayParts();
+  duaSub.textContent=DOW_FULL[new Date(T.y,T.m,T.d).getDay()]+' '+arNum(T.d)+' '+MONTH_AR[T.m]+' '+arNum(T.y);
+  duaOverlay.hidden=false;
+  document.body.style.overflow='hidden';
+  updateDuaDot();
+}
+function closeDua(){
+  duaOverlay.hidden=true;
+  document.body.style.overflow='';
+  try{speechSynthesis.cancel();}catch(e){}
+  updateDuaDot();
+}
+function updateDuaDot(){
+  const s=serial(todayParts().y,todayParts().m,todayParts().d);
+  duaBtn.classList.toggle('unread',isDuaDay(s)&&pastDuaTime()&&lnum(K_READ)!==s);
+}
+function speakDua(){
+  try{
+    if(!('speechSynthesis' in window)){toast('متصفحك لا يدعم القراءة الصوتية');return;}
+    if(speechSynthesis.speaking||speechSynthesis.pending){speechSynthesis.cancel();toast('تم إيقاف القراءة');return;}
+    const u=new SpeechSynthesisUtterance(DUA_TEXT);
+    const ar=speechSynthesis.getVoices().find(v=>v.lang&&v.lang.toLowerCase().indexOf('ar')===0);
+    if(ar)u.voice=ar;
+    u.lang='ar-SA';u.rate=.85;
+    speechSynthesis.cancel();speechSynthesis.speak(u);
+    toast('جارٍ القراءة — اضغط مجدداً للإيقاف');
+  }catch(e){toast('تعذرت القراءة الصوتية');}
+}
+function duaDone(){
+  lset(K_READ,serial(todayParts().y,todayParts().m,todayParts().d));
+  closeDua();
+  toast('تقبّل الله طاعتك — تم تسجيل قراءة الدعاء لهذه الليلة');
+}
+function notifyDua(){
+  if(!('Notification' in window)||Notification.permission!=='granted')return;
+  const s=serial(todayParts().y,todayParts().m,todayParts().d);
+  try{
+    const n=new Notification('حان وقت دعاء التحصين 🤲',{
+      body:'ليلة عمل مباركة — اضغط لقراءة الدعاء كاملاً',
+      tag:'dua-'+s,icon:DUA_ICON
+    });
+    n.onclick=()=>{try{window.focus();}catch(e){} openDua(); try{n.close();}catch(e){}};
+  }catch(e){}
+  if(navigator.vibrate)try{navigator.vibrate([300,150,300]);}catch(e){}
+}
+function checkDua(){
+  const s=serial(todayParts().y,todayParts().m,todayParts().d);
+  updateDuaDot();
+  if(!isDuaDay(s)||!pastDuaTime())return;
+  if(lnum(K_NOTIFIED)===s)return;
+  lset(K_NOTIFIED,s);
+  notifyDua();
+  openDua();
+}
+duaBtn.addEventListener('click',openDua);
+duaX.addEventListener('click',closeDua);
+duaDoneBtn.addEventListener('click',duaDone);
+duaSpeak.addEventListener('click',speakDua);
+duaOverlay.addEventListener('click',e=>{if(e.target===duaOverlay)closeDua();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!duaOverlay.hidden)closeDua();});
+duaBarEl.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;
+  if(b.dataset.act==='enable'){
+    if(!('Notification' in window)){toast('متصفحك لا يدعم الإشعارات');return;}
+    Notification.requestPermission().then(()=>{renderDuaBar();if(Notification.permission==='granted')toast('تم تفعيل الإشعارات — ستصلك التذكيرات ٤:٣٠ مساءً أيام العمل');});
+  }
+  if(b.dataset.act==='test'){
+    if(Notification.permission!=='granted'){toast('فعّل الإشعارات أولاً');return;}
+    try{new Notification('تجربة إشعار — تقويم أيام العمل',{body:'هكذا سيصلك تذكير الدعاء كل ليلة عمل ٤:٣٠ مساءً',icon:DUA_ICON});toast('أُرسل إشعار تجريبي');}catch(e){}
+  }
+  if(b.dataset.act==='open')openDua();
+});
+
+function renderAll(wave){
+  renderMonths(wave);renderSummary();renderToday();renderFoot();
+  if(wave)setTimeout(()=>{
+    document.querySelectorAll('#months .cell').forEach(c=>c.style.transitionDelay='');
+    monthsEl.classList.remove('wave');
+  },1100);
+}
+
+/* تحديث تلقائي عند تبدّل اليوم */
+let lastKey=(()=>{const T=todayParts();return T.y+'-'+T.m+'-'+T.d;})();
+setInterval(()=>{
+  const T=todayParts(),k=T.y+'-'+T.m+'-'+T.d;
+  if(k!==lastKey){lastKey=k;renderAll(false);}
+},30000);
+
+/* ============ التشغيل ============ */
+buildDuaBody();
+renderDuaBar();
+renderAll(false);
+checkDua();
+setInterval(checkDua,20000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkDua();});
 </script>
 </body>
 </html>

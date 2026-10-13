@@ -1,5 +1,5 @@
-const CACHE='twq-cal-v1';
-const CORE=['./','./index.html','./manifest.json','./icon.svg'];
+const CACHE='twq-cal-v3';
+const CORE=['./','./index.html','./manifest.json','./icon.svg','./style.css','./app1.js','./app2.js'];
 
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE).then(async c=>{
@@ -7,7 +7,6 @@ self.addEventListener('install',e=>{
     await self.skipWaiting();
   }));
 });
-
 self.addEventListener('activate',e=>{
   e.waitUntil(
     caches.keys()
@@ -15,10 +14,8 @@ self.addEventListener('activate',e=>{
       .then(()=>self.clients.claim())
   );
 });
-
 self.addEventListener('fetch',e=>{
   if(e.request.method!=='GET')return;
-  /* صفحة التطبيق: الشبكة أولاً حتى تصلك التحديثات فوراً، وعند انقطاع النت تعمل من الذاكرة */
   if(e.request.mode==='navigate'){
     e.respondWith(
       fetch(e.request)
@@ -27,7 +24,6 @@ self.addEventListener('fetch',e=>{
     );
     return;
   }
-  /* باقي الملفات: الذاكرة أولاً للسرعة */
   e.respondWith(
     caches.match(e.request,{ignoreSearch:true}).then(hit=>hit||fetch(e.request).then(res=>{
       if(res.ok&&e.request.url.indexOf(location.origin)===0){

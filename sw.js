@@ -24,7 +24,6 @@ self.addEventListener('fetch',e=>{
     );
     return;
   }
-  /* ملفات الكود: الشبكة أولاً حتى تصل التحديثات فوراً — والذاكرة احتياط عند انقطاع النت */
   e.respondWith(
     fetch(e.request)
       .then(res=>{

@@ -1,0 +1,17 @@
+{
+  "name": "تقويم أيام العمل",
+  "short_name": "تقويم العمل",
+  "description": "تقويم دورة العمل والإجازة مع الرخص وتذكير دعاء التحصين",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#060606",
+  "theme_color": "#060606",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

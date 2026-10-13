@@ -1,5 +1,5 @@
 'use strict';
-/* ===== موعد التذكير القادم ===== */
+/* ===== موعد التذكير القادم (مُصلَّح: استخدام dowOf) ===== */
 function nextDuaInfo(){
   if(!state)return null;
   const ts=todaySerial();
@@ -9,7 +9,7 @@ function nextDuaInfo(){
     const target=new Date(dt.y,dt.m,dt.d,16,30,0);
     if(target.getTime()<=Date.now())continue;
     const mins=Math.max(1,Math.round((target-Date.now())/60000));
-    const when=(k===0?'اليوم':k===1?'غداً':DOW_FULL[dt.getUTCDay()])+' '+arNum(dt.d)+' '+MONTH_AR[dt.m];
+    const when=(k===0?'اليوم':k===1?'غداً':DOW_FULL[dowOf(s)])+' '+arNum(dt.d)+' '+MONTH_AR[dt.m];
     return{when,mins};
   }
   return null;
@@ -71,7 +71,7 @@ function buildDuaBody(){duaBody.innerHTML=DUA_PARAS.map(p=>'<p>'+p+'</p>').join(
 function openDua(){
   const T=todayParts(),s=todaySerial();
   duaSub.textContent=(isDuaDay(s)&&pastDuaTime()?'ليلة عمل — ':'')
-    +DOW_FULL[new Date(T.y,T.m,T.d).getDay()]+' '+arNum(T.d)+' '+MONTH_AR[T.m]+' '+arNum(T.y);
+    +DOW_FULL[dowOf(s)]+' '+arNum(T.d)+' '+MONTH_AR[T.m]+' '+arNum(T.y);
   duaOverlay.hidden=false;
   document.body.style.overflow='hidden';
   updateDuaBtn();

@@ -7,6 +7,7 @@ const DOW=['أحد','اثنين','ثلاثاء','أربعاء','خميس','جم�
 const DOW_FULL=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
 const serial=(y,m,d)=>Math.round(Date.UTC(y,m,d)/864e5);
 const fromSerial=s=>{const t=new Date(s*864e5);return{y:t.getUTCFullYear(),m:t.getUTCMonth(),d:t.getUTCDate()};};
+const dowOf=s=>new Date(s*864e5).getUTCDay();
 const mod6=n=>((n%6)+6)%6;
 const daysPhrase=n=>n===1?'يوم واحد':n===2?'يومين':arNum(n)+' أيام';
 
@@ -16,7 +17,7 @@ const MONTHS=(()=>{const now=new Date();const a=[];
     for(let m=(y===now.getFullYear()?now.getMonth():0);m<12;m++)a.push({y,m});
   return a;})();
 
-/* ===== حالة الدورة (تبدأ فارغة — تُحدد بالضغط على ٣ أيام) ===== */
+/* ===== حالة الدورة ===== */
 const KEY='twq-work-calendar-3x3-v2';
 let state=(()=>{try{const s=JSON.parse(localStorage.getItem(KEY));
   if(s&&s.base&&Array.isArray(s.offsets)&&s.offsets.length===3)return s;}catch(e){}return null;})();
@@ -196,15 +197,15 @@ function renderSummary(){
   summaryEl.innerHTML=h;
 }
 
-/* ===== شريط اليوم ===== */
+/* ===== شريط اليوم (مُصلَّح: استخدام dowOf) ===== */
 function renderToday(){
   const T=todayParts();
   const ts=serial(T.y,T.m,T.d),baseS=baseSerial();
   const licSet=licEdit?licPicked:licenses;
+  tDateEl.textContent=DOW_FULL[dowOf(ts)]+' '+arNum(T.d)+' '+MONTH_AR[T.m]+' '+arNum(T.y);
   if(!state){
     tBadgeEl.innerHTML='<span class="badge none">لم يُحدد الجدول بعد</span>';
     tNextEl.textContent='اضغط «تعديل أيام العمل» ثم اختر ٣ أيام متتالية — ويتحسب كل شيء تلقائياً';
-    tDateEl.textContent=DOW_FULL[new Date(T.y,T.m,T.d).getDay()]+' '+arNum(T.d)+' '+MONTH_AR[T.m]+' '+arNum(T.y);
     weekEl.innerHTML='';
     return;
   }
@@ -223,12 +224,11 @@ function renderToday(){
   for(let k=1;k<=6;k++){const o=mod6(off+k);if(isW?!ws.includes(o):ws.includes(o)){nx=k;break;}}
   tNextEl.innerHTML=(isW?'الإجازة القادمة بعد ':'العمل القادم بعد ')+daysPhrase(nx)
     +(licSet.has(ts)?' · <span style="color:var(--lic-ink)">اليوم من أيام رخصتك — لا تذكير دعاء اليوم</span>':'');
-  tDateEl.textContent=DOW_FULL[new Date(T.y,T.m,T.d).getDay()]+' '+arNum(T.d)+' '+MONTH_AR[T.m]+' '+arNum(T.y);
   let h='';
   for(let k=-3;k<=3;k++){
-    const s2=ts+k,dt=fromSerial(s2);
+    const s2=ts+k;
     const kind=licSet.has(s2)?'lic':(ws.includes(mod6(s2-baseS))?'work':'rest');
-    h+='<div class="wd '+kind+(k===0?' now':'')+'"><i></i><span>'+(k===0?'اليوم':DOW[dt.getUTCDay()])+'</span></div>';
+    h+='<div class="wd '+kind+(k===0?' now':'')+'"><i></i><span>'+(k===0?'اليوم':DOW[dowOf(s2)])+'</span></div>';
   }
   weekEl.innerHTML=h;
 }

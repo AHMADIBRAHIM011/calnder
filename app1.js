@@ -1,3 +1,4 @@
+/* APP1 v5 */
 'use strict';
 /* ===== أدوات عامة ===== */
 const AR='٠١٢٣٤٥٦٧٨٩';
@@ -168,7 +169,7 @@ function renderMonths(wave){
       if(isT)cls+=' today';
       const delay=(wave&&!editing&&baseS!==null)?' style="transition-delay:'+Math.max(0,s-baseS)*1.1+'ms"':'';
       h+='<button type="button" class="'+cls+'" data-s="'+s+'"'+extra+delay
-        +' title="'+DOW_FULL[new Date(mo.y,mo.m,d).getDay()]+' '+arNum(d)+' '+MONTH_AR[mo.m]+' '+arNum(mo.y)+kind+'"><span>'+arNum(d)+'</span></button>';
+        +' title="'+DOW_FULL[dowOf(s)]+' '+arNum(d)+' '+MONTH_AR[mo.m]+' '+arNum(mo.y)+kind+'"><span>'+arNum(d)+'</span></button>';
     }
     h+='</div></section>';
   }
@@ -197,7 +198,7 @@ function renderSummary(){
   summaryEl.innerHTML=h;
 }
 
-/* ===== شريط اليوم (مُصلَّح: استخدام dowOf) ===== */
+/* ===== شريط اليوم (نسخة مُصلحة احتياطية — إن وُجدت نسخة في app2.js فهي المطّردة) ===== */
 function renderToday(){
   const T=todayParts();
   const ts=serial(T.y,T.m,T.d),baseS=baseSerial();

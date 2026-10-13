@@ -1,3 +1,4 @@
+/* STYLE v5 */
 :root{
   --bg:#060606; --panel:#0c0c0a; --line:#1d1b15; --line2:#2b2820;
   --ink:#e9e4d6; --dim:#8a8272; --dim2:#6b6455;
@@ -139,4 +140,4 @@ footer .fr{display:inline-flex;align-items:center;gap:5px;color:#cfc9ba}
   .tinfo{flex-basis:100%}
   .weekstrip{width:100%;justify-content:space-between}
   .legend{margin-inline-start:0}
-} 
+}

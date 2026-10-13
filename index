@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#060606">
+<title>تقويم أيام العمل</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Reem+Kufi:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060606; --panel:#0c0c0a; --line:#1d1b15; --line2:#2b2820;
+  --ink:#e9e4d6; --dim:#8a8272; --dim2:#6b6455;
+  --gold:#d9a641; --gold-ink:#e2b95c; --gold-soft:rgba(217,166,65,.45);
+  --work:#e23d42; --work-ink:#ff7d72; --work-bg:rgba(226,61,66,.13); --work-line:rgba(226,61,66,.55);
+  --rest:#2ebb6e; --rest-ink:#55d68f; --rest-bg:rgba(46,187,110,.12); --rest-line:rgba(46,187,110,.5);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:13px;line-height:1.7;-webkit-font-smoothing:antialiased}
+button{font-family:inherit}
+
+/* ===== الشريط العلوي ===== */
+.top{position:sticky;top:0;z-index:40;background:rgba(6,6,6,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-in{max-width:1180px;margin:0 auto;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+h1{font-family:'Reem Kufi',sans-serif;font-weight:500;font-size:21px;display:flex;align-items:center;gap:9px}
+h1 svg{color:var(--gold);flex:0 0 auto}
+h1 em{font-style:normal;color:var(--gold)}
+.sub{font-size:10.5px;color:var(--dim);margin-top:1px}
+.hbtns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:7px;background:none;border:1px solid var(--line2);color:#cfc9ba;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;transition:border-color .2s,color .2s,background .2s}
+.btn:hover{border-color:var(--gold);color:var(--gold-ink)}
+.btn.gold{border-color:var(--gold-soft);color:var(--gold-ink)}
+.btn.gold:hover{background:rgba(217,166,65,.08)}
+.btn.small{padding:4px 11px;font-size:11px}
+.btn.filled{background:var(--gold);border-color:var(--gold);color:#171204;font-weight:600}
+.btn.filled:hover{background:#e5b558;color:#171204}
+.dotu{width:7px;height:7px;border-radius:50%;background:var(--gold);display:none;box-shadow:0 0 6px var(--gold)}
+#duaBtn.unread .dotu{display:inline-block}
+.editbar{max-width:1180px;margin:0 auto;padding:4px 18px 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-top:1px dashed var(--line)}
+.editbar[hidden]{display:none}
+.editbar .msg{font-size:11.5px;color:var(--gold-ink)}
+.pcount{font-size:11px;color:#a89f8c;border:1px solid var(--line2);border-radius:20px;padding:0 12px;line-height:20px;min-width:56px;text-align:center}
+.spacer{flex:1}
+
+/* ===== شريط اليوم ===== */
+.todaybar{max-width:1180px;margin:16px auto 0;padding:0 18px;display:flex;gap:12px;align-items:stretch;flex-wrap:wrap}
+.tinfo{flex:1 1 380px;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tlabel{font-size:10px;color:var(--gold);border:1px solid var(--gold-soft);border-radius:20px;padding:0 10px;line-height:20px}
+.tdate{font-size:14px;font-weight:600;letter-spacing:.2px}
+.badge{font-size:11px;border-radius:20px;padding:1px 11px;border:1px solid;white-space:nowrap}
+.badge.work{color:var(--work-ink);border-color:var(--work-line);background:var(--work-bg)}
+.badge.rest{color:var(--rest-ink);border-color:var(--rest-line);background:var(--rest-bg)}
+.tnext{font-size:11px;color:var(--dim);flex-basis:100%;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.warnchip{font-size:9.5px;color:#a89f8c;border:1px dashed var(--line2);border-radius:20px;padding:0 9px}
+.weekstrip{display:flex;gap:6px;align-items:flex-end;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:9px 12px}
+.wd{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:8.5px;color:var(--dim);min-width:34px}
+.wd i{width:100%;height:22px;border-radius:6px;border:1px solid;display:block}
+.wd.work i{background:var(--work-bg);border-color:var(--work-line)}
+.wd.rest i{background:var(--rest-bg);border-color:var(--rest-line)}
+.wd.now{color:var(--gold)}
+.wd.now i{border:2px solid var(--gold)}
+.wd.now span{color:var(--gold-ink)}
+
+/* ===== شريط الدعاء والإشعارات ===== */
+.duabar{max-width:1180px;margin:10px auto 0;padding:0 18px}
+.duabar-in{border:1px solid var(--gold-soft);background:linear-gradient(180deg,#100f0a,#0b0a08);border-radius:12px;padding:9px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.duabar .st{font-size:11.5px;display:inline-flex;align-items:center;gap:7px;color:#a89f8c}
+.duabar .st .ok{color:var(--rest-ink)}
+.duabar .st .bad{color:var(--work-ink)}
+.duabar .st .mid{color:var(--gold-ink)}
+.duabar .next{font-size:11px;color:var(--gold-ink);flex-basis:100%}
+.duabar details{width:100%;font-size:10.5px;color:var(--dim2)}
+.duabar details summary{cursor:pointer;color:var(--dim)}
+.duabar details div{padding-top:6px;line-height:1.9}
+.bell{color:var(--gold);flex:0 0 auto}
+
+/* ===== عدّاد الشهور ===== */
+.sumwrap{max-width:1180px;margin:14px auto 0;padding:0 18px}
+.sumhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.sumtitle{font-size:11px;color:var(--dim)}
+.legend{display:flex;gap:14px;font-size:10.5px;color:#a89f8c;margin-inline-start:auto}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.sw{width:11px;height:11px;border-radius:3.5px;display:inline-block}
+.sw.w{background:rgba(226,61,66,.25);border:1px solid rgba(226,61,66,.7)}
+.sw.r{background:rgba(46,187,110,.25);border:1px solid rgba(46,187,110,.7)}
+.sw.t{border:2px solid var(--gold)}
+.summary{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px}
+.summary::-webkit-scrollbar{height:5px}
+.summary::-webkit-scrollbar-thumb{background:#26231b;border-radius:3px}
+.scard{flex:0 0 auto;min-width:106px;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:7px 11px;transition:opacity .3s}
+.scard.dim{opacity:.5}
+.scard b{display:flex;align-items:baseline;gap:5px;font-size:12px;font-weight:600}
+.scard b i{font-style:normal;font-size:9.5px;color:var(--dim2)}
+.scard .row{display:flex;gap:10px;font-size:10.5px;color:#a89f8c;margin-top:2px;white-space:nowrap}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block;flex:0 0 auto}
+.dot.w{background:var(--work)}
+.dot.r{background:var(--rest)}
+.scard.cur{border-color:var(--gold-soft)}
+
+/* ===== شبكة الشهور ===== */
+#months{max-width:1180px;margin:16px auto 0;padding:0 18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(226px,1fr));gap:14px}
+.month{border:1px solid var(--line);background:#0b0b09;border-radius:13px;padding:11px 11px 12px;transition:border-color .3s,background .3s}
+.month.cur{border-color:var(--gold-soft);background:#0e0d09}
+.month>header{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:1px 3px 9px}
+.month h2{font-family:'Reem Kufi',sans-serif;font-weight:500;font-size:14.5px}
+.mstat{display:flex;gap:9px;font-size:10px;color:#a89f8c}
+.mstat b{font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.dow,.days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.dow span{text-align:center;font-size:9px;color:var(--dim2);padding-bottom:3px}
+.cell{aspect-ratio:1;border:1px solid transparent;border-radius:7px;background:none;color:var(--dim2);font-size:11.5px;font-weight:500;display:flex;align-items:center;justify-content:center;position:relative;padding:0;appearance:none;user-select:none;cursor:default;transition:background .3s,color .3s,border-color .3s}
+.cell.work{color:var(--work-ink);background:var(--work-bg);border-color:var(--work-line)}
+.cell.rest{color:var(--rest-ink);background:var(--rest-bg);border-color:var(--rest-line)}
+.cell.empty{pointer-events:none}
+.cell.today{border:2px solid var(--gold);animation:todayPulse 2.6s ease-in-out infinite}
+@keyframes todayPulse{0%,100%{border-color:#d9a641}50%{border-color:rgba(217,166,65,.4)}}
+#months.editing .cell:not(.empty){color:var(--dim2);background:#0a0a08;border-color:#191813;cursor:pointer}
+#months.editing .cell:not(.empty):hover{border-color:var(--gold-soft);color:#a89f8c}
+#months.editing .cell.today{border:2px solid var(--gold);background:#0d0c09;color:var(--dim2);animation:none}
+#months.editing .cell.picked{color:#fff;background:rgba(226,61,66,.22);border-color:var(--work)}
+#months.editing .cell.picked::after{content:attr(data-pick);position:absolute;top:1px;inset-inline-start:4px;font-size:8px;color:#ffb4ad;line-height:1.2}
+#months.wave .cell{transition:background .55s ease,color .55s ease,border-color .55s ease}
+
+/* ===== نافذة الدعاء ===== */
+#duaOverlay{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.8);backdrop-filter:blur(7px);display:flex;align-items:center;justify-content:center;padding:16px}
+#duaOverlay[hidden]{display:none}
+.dua-card{position:relative;width:min(620px,100%);max-height:88vh;overflow-y:auto;background:linear-gradient(180deg,#12110b,#0a0a08);border:1px solid var(--gold-soft);border-radius:18px;padding:26px 22px 20px;box-shadow:0 0 0 1px rgba(0,0,0,.6),0 24px 70px rgba(0,0,0,.7);animation:duaIn .45s ease}
+@keyframes duaIn{from{transform:translateY(16px) scale(.97);opacity:0}}
+.dua-x{position:absolute;top:10px;inset-inline-start:10px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line2);background:none;color:var(--dim);font-size:15px;cursor:pointer;line-height:1}
+.dua-x:hover{border-color:var(--gold);color:var(--gold-ink)}
+.dua-head{text-align:center}
+.dua-moon{font-size:26px;color:var(--gold);display:block;line-height:1.4}
+.dua-title{font-family:'Reem Kufi',sans-serif;font-size:21px;color:var(--gold-ink);margin-top:4px}
+.dua-sub{font-size:10.5px;color:var(--dim);display:block;margin-top:3px}
+.dua-sep{width:90px;height:1px;background:linear-gradient(90deg,transparent,var(--gold-soft),transparent);margin:13px auto}
+.dua-body{font-size:13.5px;line-height:2.2;color:#efe9da;text-align:center}
+.dua-body p{margin:0 0 11px}
+.dua-actions{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+
+/* ===== التذييل والتوست ===== */
+footer{max-width:1180px;margin:20px auto 0;padding:13px 18px 34px;border-top:1px solid var(--line);color:var(--dim);font-size:11px;display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+footer b{font-weight:600;color:#cfc9ba}
+footer .fr{display:inline-flex;align-items:center;gap:5px;color:#cfc9ba}
+#toast{position:fixed;bottom:22px;right:50%;transform:translate(50%,16px);background:#14120c;border:1px solid var(--gold-soft);color:var(--gold-ink);padding:8px 18px;border-radius:24px;font-size:12px;opacity:0;pointer-events:none;transition:.3s;z-index:99;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translate(50%,0)}
+
+@media(max-width:620px){
+  h1{font-size:17px}
+  #months{grid-template-columns:repeat(auto-fill,minmax(205px,1fr))}
+  .tinfo{flex-basis:100%}
+  .weekstrip{width:100%;justify-content:space-between}
+  .legend{margin-inline-start:0}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <div>
+      <h1>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 17.5h.01M12 17.5h.01"/></svg>
+        تقويم <em>أيام العمل</em>
+      </h1>
+      <p class="sub">دورة ٣ أيام عمل · ٣ أيام إجازة — مع تذكير دعاء التحصين ٤:٣٠ مساءً في كل ليلة عمل</p>
+    </div>
+    <div class="hbtns">
+      <button class="btn" id="duaBtn">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        الدعاء <span class="dotu"></span>
+      </button>
+      <button class="btn gold" id="editBtn">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+        تعديل أيام العمل
+      </button>
+    </div>
+  </div>
+  <div class="editbar" id="editBar" hidden>
+    <span class="msg">وضع التعديل — الألوان مُسحة. اضغط على ثلاثة أيام عمل (يُفضَّل أن تكون متتالية) وسيُعاد تلوين التقويم كله تلقائيًا.</span>
+    <span class="pcount" id="pcount">٠ / ٣</span>
+    <span class="spacer"></span>
+    <button class="btn small" id="resetBtn">الافتراضي: ١ أكتوبر ٢٠٢٦</button>
+    <button class="btn small" id="cancelBtn">إلغاء</button>
+  </div>
+</header>
+
+<section class="todaybar">
+  <div class="tinfo">
+    <span class="tlabel">اليوم</span>
+    <strong class="tdate" id="tDate"></strong>
+    <span id="tBadge"></span>
+    <span class="tnext" id="tNext"></span>
+  </div>
+  <div class="weekstrip" id="weekStrip" title="الأسبوع من حولك"></div>
+</section>
+
+<!-- شريط تذكير الدعاء -->
+<section class="duabar">
+  <div class="duabar-in" id="duaBar"></div>
+</section>
+
+<section class="sumwrap">
+  <div class="sumhead">
+    <span class="sumtitle">عدّاد الشهور — أيام العمل والإجازة في كل شهر</span>
+    <div class="legend">
+      <span><i class="sw w"></i>عمل</span>
+      <span><i class="sw r"></i>إجازة</span>
+      <span><i class="sw t"></i>اليوم</span>
+    </div>
+  </div>
+  <div class="summary" id="summary"></div>
+</section>
+
+<main id="months"></main>
+
+<footer id="foot"></footer>
+
+<!-- نافذة الدعاء -->
+<div id="duaOverlay" hidden>
+  <div class="dua-card">
+    <button class="dua-x" id="duaX" title="إغلاق">✕</button>
+    <div class="dua-head">
+      <span class="dua-moon">☾</span>
+      <div class="dua-title">دعاء تحصين النفس</div>
+      <span class="dua-sub" id="duaSub"></span>
+    </div>
+    <div class="dua-sep"></div>
+    <div class="dua-body" id="duaBody"></div>
+    <div class="dua-actions">
+      <button class="btn small" id="duaSpeak">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a9 9 0 0 1 0 14"/></svg>
+        استماع
+      </button>
+      <button class="btn small filled" id="duaDone">تم القراءة ✓</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status"></div>
+
+<script>
+'use strict';
+
+/* ============ أدوات عامة ============ */
+const AR='٠١٢٣٤٥٦٧٨٩';
+const arNum=n=>String(n).replace(/\d/g,d=>AR[+d]);
+const MONTH_AR=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+const DOW=['أحد','اثنين','ثلاثاء','أربعاء','خميس','جمعة','سبت'];
+const DOW_FULL=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+const serial=(y,m,d)=>Math.round(Date.UTC(y,m,d)/864e5);
+const fromSerial=s=>{const t=new Date(s*864e5);return{y:t.getUTCFullYear(),m:t.getUTCMonth(),d:t.getUTCDate()};};
+const mod6=n=>((n%6)+6)%6;
+const daysPhrase=n=>n===1?'يوم واحد':n===2?'يومين':arNum(n)+' أيام';
+
+/* ============ حالة الدورة ============ */
+const KEY='twq-work-calendar-3x3';
+const DEFAULT=()=>({base:{y:2026,m:9,d:1},offsets:[0,1,2]});
+let state=(()=>{try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.base&&Array.isArray(s.offsets)&&s.offsets.length===3)return s;}catch(e){}return DEFAULT();})();
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}};
+const baseSerial=()=>serial(state.base.y,state.base.m,state.base.d);
+const classify=s=>state.offsets.includes(mod6(s-baseSerial()))?'work':'rest';
+const MONTHS=(()=>{const a=[];for(let y=2026;y<=2027;y++)for(let m=0;m<12;m++){if(y===2026&&m<8)continue;if(y===2027&&m>11)break;a.push({y,m});}return a;})();
+
+/* ============ نص الدعاء ============ */
+const DUA_PARAS=[
+'اللهم إني أعوذ بك من ساعة السوء ويوم السوء وليلة السوء وصديق السوء وجار السوء، وأعوذ بك من ذي الوجهين وذي اللسانين، وأعوذ بك من إبليس وذريته وشياطينه، وأعوذ بك من الحديد والحريق والطريق وساعة الغفلة',
+'ربنا عليك توكلت وأنت رب العرش العظيم',
+'اللهم إني حصّنت نفسي وأهل بيتي جميعًا بالحيّ القيوم الذي لا تأخذه سنة ولا نوم، ودفعت عني وعنهم السوء بلا حول ولا قوة إلا بالله العلي العظيم',
+'اللهم إني أعوذ بك من بكاء يرهقني وهمّ يفجعني، اللهم اجبر خاطري واشرح صدري',
+'استغفرك ربي من كل الذنوب والخطايا، ربي لا تكسر لي قلبًا ولا تصعب عليّ أمرًا ولا تحرمني من تعلّقت به الروح',
+'واحفظ لي عائلتي وأحبتي، ومن أراد لي الخير يارب العالمين'
+];
+const DUA_TEXT=DUA_PARAS.join(' ');
+
+/* ============ مفاتيح تذكير الدعاء ============ */
+const DUA_MIN=16*60+30; /* ٤:٣٠ مساء */
+const K_NOTIFIED='twq-dua-notified', K_READ='twq-dua-read';
+const lnum=k=>{try{const v=localStorage.getItem(k);return v===null?-1:+v;}catch(e){return -1;}};
+const lset=(k,v)=>{try{localStorage.setItem(k,String(v));}catch(e){}};
+const todayParts=()=>{const t=new Date();return{y:t.getFullYear(),m:t.getMonth(),d:t.getDate()};};
+const todaySerial=()=>{const T=todayParts();return serial(T.y,T.m,T.d);};
+const isWorkDay=s=>classify(s)==='work';
+const pastDuaTime=()=>{const n=new Date();return n.getHours()*60+n.getMinutes()>=DUA_MIN;};
+
+/* أيقونة الإشعار (تُرسم مرة واحدة) */
+const DUA_ICON=(()=>{try{const c=document.createElement('canvas');c.width=c.height=192;const x=c.getContext('2d');
+x.fillStyle='#0b0b09';x.fillRect(0,0,192,192);
+x.strokeStyle='#d9a641';x.lineWidth=10;x.strokeRect(10,10,172,172);
+x.fillStyle='#d9a641';x.font='110px serif';x.textAlign='center';x.textBaseline='middle';x.fillText('☾',96,104);
+return c.toDataURL('image/png');}catch(e){return undefined;}})();
+
+/* ============ العناصر ============ */
+const $=id=>document.getElementById(id);
+const monthsEl=$('months'),summaryEl=$('summary'),weekEl=$('weekStrip'),
+      tDateEl=$('tDate'),tBadgeEl=$('tBadge'),tNextEl=$('tNext'),
+      editBtn=$('editBtn'),editBar=$('editBar'),pcountEl=$('pcount'),
+      cancelBtn=$('cancelBtn'),resetBtn=$('resetBtn'),footEl=$('foot'),toastEl=$('toast'),
+      duaBarEl=$('duaBar'),duaBtn=$('duaBtn'),duaOverlay=$('duaOverlay'),
+      duaSub=$('duaSub'),duaBody=$('duaBody'),duaX=$('duaX'),duaSpeak=$('duaSpeak'),duaDone=$('duaDone');
+const BTN_HTML=editBtn.innerHTML;
+
+/* ============ وضع التعديل ============ */
+let editing=false,picked=[];
+function renderMonths(wave){
+  const T=todayParts();
+  monthsEl.classList.toggle('editing',editing);
+  monthsEl.classList.toggle('wave',!!wave);
+  const baseS=baseSerial();
+  let h='';
+  for(const mo of MONTHS){
+    const lead=new Date(mo.y,mo.m,1).getDay();
+    const dim=new Date(mo.y,mo.m+1,0).getDate();
+    const isCur=mo.y===T.y&&mo.m===T.m;
+    let w=0,r=0;
+    for(let d=1;d<=dim;d++){if(classify(serial(mo.y,mo.m,d))==='work')w++;else r++;}
+    h+='<section class="month'+(isCur?' cur':'')+'"><header><h2>'+MONTH_AR[mo.m]+' '+arNum(mo.y)+'</h2>'
+      +'<span class="mstat"><b><i class="dot w"></i>'+arNum(w)+'</b><b><i class="dot r"></i>'+arNum(r)+'</b></span></header>'
+      +'<div class="dow">'+DOW.map(x=>'<span>'+x+'</span>').join('')+'</div><div class="days">';
+    for(let i=0;i<lead;i++)h+='<span class="cell empty"></span>';
+    for(let d=1;d<=dim;d++){
+      const s=serial(mo.y,mo.m,d);
+      const isT=mo.y===T.y&&mo.m===T.m&&d===T.d;
+      let cls='cell',extra='',kind='';
+      if(editing){
+        const pi=picked.indexOf(s);
+        if(pi>-1){cls+=' picked';extra=' data-pick="'+arNum(pi+1)+'"';}
+      }else{
+        cls+=' '+classify(s);
+        kind=' — '+(classify(s)==='work'?'يوم عمل':'يوم إجازة');
+      }
+      if(isT)cls+=' today';
+      const delay=(wave&&!editing)?' style="transition-delay:'+Math.max(0,s-baseS)*1.1+'ms"':'';
+      h+='<button type="button" class="'+cls+'" data-s="'+s+'"'+extra+delay
+        +' title="'+DOW_FULL[new Date(mo.y,mo.m,d).getDay()]+' '+arNum(d)+' '+MONTH_AR[mo.m]+' '+arNum(mo.y)+kind+'"><span>'+arNum(d)+'</span></button>';
+    }
+    h+='</div></section>';
+  }
+  monthsEl.innerHTML=h;
+}
+function renderSummary(){
+  const T=todayParts();
+  let h='';
+  for(const mo of MONTHS){
+    const dim=new Date(mo.y,mo.m+1,0).getDate();
+    let w=0,r=0;
+    for(let d=1;d<=dim;d++){if(classify(serial(mo.y,mo.m,d))==='work')w++;else r++;}
+    const isCur=mo.y===T.y&&mo.m===T.m;
+    h+='<div class="scard'+(isCur?' cur':'')+(editing?' dim':'')+'"><b>'+MONTH_AR[mo.m]+'<i>'+arNum(mo.y)+'</i></b>'
+      +'<span class="row"><span><i class="dot w"></i>عمل '+arNum(w)+'</span><span><i class="dot r"></i>إجازة '+arNum(r)+'</span></span></div>';
+  }
+  summaryEl.innerHTML=h;
+}
+function renderToday(){
+  const T=todayParts();
+  const ts=serial(T.y,T.m,T.d),baseS=baseSerial();
+  const off=mod6(ts-baseS);
+  const ws=[...state.offsets].sort((a,b)=>a-b);
+  const rs=[0,1,2,3,4,5].filter(o=>!ws.includes(o));
+  const isW=ws.includes(off);
+  tBadgeEl.innerHTML=isW
+    ?'<span class="badge work">يوم عمل '+arNum(ws.indexOf(off)+1)+' من '+arNum(ws.length)+'</span>'
+    :'<span class="badge rest">يوم إجازة '+arNum(rs.indexOf(off)+1)+' من '+arNum(rs.length)+'</span>';
+  let nx=0;
+  for(let k=1;k<=6;k++){const o=mod6(off+k);if(isW?!ws.includes(o):ws.includes(o)){nx=k;break;}}
+  const inRange=MONTHS.some(mo=>mo.y===T.y&&mo.m===T.m);
+  tNextEl.innerHTML=(isW?'الإجازة القادمة بعد ':'العمل القادم بعد ')+daysPhrase(nx)
+    +(inRange?'':' <span class="warnchip">تاريخ جهازك خارج نطاق التقويم المعروض</span>');
+  tDateEl.textContent=DOW_FULL[new Date(T.y,T.m,T.d).getDay()]+' '+arNum(T.d)+' '+MONTH_AR[T.m]+' '+arNum(T.y);
+  let h='';
+  for(let k=-3;k<=3;k++){
+    const s2=ts+k,dt=fromSerial(s2);
+    const kind=ws.includes(mod6(s2-baseS))?'work':'rest';
+    h+='<div class="wd '+kind+(k===0?' now':'')+'"><i></i><span>'+(k===0?'اليوم':DOW[dt.getUTCDay()])+'</span></div>';
+  }
+  weekEl.innerHTML=h;
+}
+function renderFoot(){
+  let w=0,r=0,tot=0;
+  for(const mo of MONTHS){
+    const dim=new Date(mo.y,mo.m+1,0).getDate();
+    for(let d=1;d<=dim;d++){tot++;classify(serial(mo.y,mo.m,d))==='work'?w++:r++;}
+  }
+  footEl.innerHTML='<span>إجمالي الفترة: <b>'+arNum(tot)+'</b> يوماً</span>'
+    +'<span class="fr"><i class="dot w"></i>أيام العمل: <b>'+arNum(w)+'</b></span>'
+    +'<span class="fr"><i class="dot r"></i>أيام الإجازة: <b>'+arNum(r)+'</b></span>'
+    +'<span>النمط: ٣ عمل ثم ٣ إجازة، دورة كل ٦ أيام</span>';
+}
+
+/* ============ توست ============ */
+let toastT;
+function toast(msg){toastEl.textContent=msg;toastEl.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove('show'),3600);}
+
+/* ============ موعد التذكير القادم ============ */
+function nextDuaInfo(){
+  const ts=todaySerial();
+  for(let k=0;k<10;k++){
+    const s=ts+k,dt=fromSerial(s);
+    if(classify(s)!=='work')continue;
+    const target=new Date(dt.y,dt.m,dt.d,16,30,0);
+    if(target.getTime()<=Date.now())continue;
+    const mins=Math.max(1,Math.round((target-Date.now())/60000));
+    const when=(k===0?'اليوم':k===1?'غداً':DOW_FULL[dt.getUTCDay()])+' '+arNum(dt.d)+' '+MONTH_AR[dt.m];
+    return{when,mins};
+  }
+  return null;
+}
+function durPhrase(mins){
+  if(mins<60)return'بعد '+arNum(mins)+' دقيقة';
+  const h=Math.floor(mins/60),m=mins%60;
+  return'بعد '+arNum(h)+' ساعة'+(m?' و'+arNum(m)+' دقيقة':'');
+}
+
+/* ============ شريط الدعاء ============ */
+function renderDuaBar(){
+  const sup=('Notification' in window)?Notification.permission:'unsupported';
+  let st;
+  if(sup==='granted')st='<span class="ok">الإشعارات مفعّلة ✓</span>';
+  else if(sup==='denied')st='<span class="bad">الإشعارات مرفوضة — فعّلها من إعدادات المتصفح لهذا الموقع</span>';
+  else if(sup==='unsupported')st='<span class="bad">متصفحك لا يدعم الإشعارات — سيظهر الدعاء تلقائياً عند فتح التطبيق</span>';
+  else st='<span class="mid">الإشعارات غير مفعّلة بعد</span>';
+  let acts='';
+  if(sup==='default')acts+='<button class="btn small filled" data-act="enable">تفعيل الإشعارات</button>';
+  if(sup==='granted')acts+='<button class="btn small" data-act="test">إشعار تجريبي</button>';
+  acts+='<button class="btn small" data-act="open">فتح الدعاء</button>';
+  const nx=nextDuaInfo();
+  const nxLine=nx?('التذكير القادم بدعاء التحصين: '+nx.when+' الساعة ٤:٣٠ مساءً ('+durPhrase(nx.mins)+')')
+                 :'لا تذكير قادم قريباً';
+  duaBarEl.innerHTML=
+    '<svg class="bell" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>'
+    +'<span class="st">'+st+'</span><span class="spacer"></span>'+acts
+    +'<span class="next">☾ '+nxLine+'</span>'
+    +'<details><summary>كيف أضمن وصول التذكير على هاتفي؟</summary><div>'
+    +'• <b>أندرويد:</b> أبقِ التطبيق مفتوحاً في المتصفح (يمكن تصغيره للخلفية دون إغلاقه) وسيصلك الإشعار في وقته.<br>'
+    +'• <b>آيفون:</b> افتح الملف عبر Safari ثم: مشاركة ← «إضافة إلى الشاشة الرئيسية»، وافتحه من الأيقونة واسمح بالإشعارات (iOS 16.4 أو أحدث).<br>'
+    +'• <b>الضمان الأكبر:</b> حتى لو فاتك الإشعار، عند فتح التطبيق بعد ٤:٣٠ مساءً في أي ليلة عمل يظهر الدعاء تلقائياً أمامك فلا يفوتك أبداً.'
+    +'</div></details>';
+}
+
+/* ============ الإشعار ============ */
+function notifyDua(){
+  if(!('Notification' in window)||Notification.permission!=='granted')return;
+  try{
+    const n=new Notification('حان وقت دعاء التحصين 🤲',{
+      body:'ليلة عمل مباركة — اضغط لقراءة الدعاء كاملاً',
+      tag:'dua-'+todaySerial(),icon:DUA_ICON
+    });
+    n.onclick=()=>{try{window.focus();}catch(e){} openDua(); try{n.close();}catch(e){}};
+  }catch(e){}
+  if(navigator.vibrate)try{navigator.vibrate([300,150,300]);}catch(e){}
+}
+function notifyTest(){
+  if(!('Notification' in window)){toast('متصفحك لا يدعم الإشعارات');return;}
+  if(Notification.permission!=='granted'){toast('فعّل الإشعارات أولاً');return;}
+  try{
+    const n=new Notification('تجربة إشعار — تقويم أيام العمل',{body:'هكذا سيصلك تذكير الدعاء كل ليلة عمل ٤:٣٠ مساءً',icon:DUA_ICON});
+    n.onclick=()=>{try{window.focus();}catch(e){} try{n.close();}catch(e){}};
+    toast('أُرسل إشعار تجريبي — إن لم يظهر تأكد أن التطبيق مفتوح');
+  }catch(e){toast('تعذر الإظهار — أبقِ التطبيق مفتوحاً في المقدمة أو الخلفية');}
+}
+
+/* ============ نافذة الدعاء ============ */
+function buildDuaBody(){duaBody.innerHTML=DUA_PARAS.map(p=>'<p>'+p+'</p>').join('');}
+function openDua(){
+  const T=todayParts(),s=todaySerial();
+  duaSub.textContent=(isWorkDay(s)&&pastDuaTime()?'ليلة عمل — ':'')
+    +DOW_FULL[new Date(T.y,T.m,T.d).getDay()]+' '+arNum(T.d)+' '+MONTH_AR[T.m]+' '+arNum(T.y);
+  duaOverlay.hidden=false;
+  document.body.style.overflow='hidden';
+  updateDuaBtn();
+}
+function closeDua(){
+  duaOverlay.hidden=true;
+  document.body.style.overflow='';
+  try{speechSynthesis.cancel();}catch(e){}
+  updateDuaBtn();renderDuaBar();
+}
+function updateDuaBtn(){
+  const s=todaySerial();
+  duaBtn.classList.toggle('unread',isWorkDay(s)&&pastDuaTime()&&lnum(K_READ)!==s);
+}
+function speakDua(){
+  try{
+    if(!('speechSynthesis' in window)){toast('متصفحك لا يدعم القراءة الصوتية');return;}
+    if(speechSynthesis.speaking||speechSynthesis.pending){speechSynthesis.cancel();toast('تم إيقاف القراءة');return;}
+    const u=new SpeechSynthesisUtterance(DUA_TEXT);
+    const vs=speechSynthesis.getVoices(),ar=vs.find(v=>v.lang&&v.lang.toLowerCase().indexOf('ar')===0);
+    if(ar)u.voice=ar;
+    u.lang='ar-SA';u.rate=.85;u.pitch=1;
+    speechSynthesis.cancel();speechSynthesis.speak(u);
+    toast('جارٍ القراءة — اضغط مجدداً للإيقاف');
+  }catch(e){toast('تعذرت القراءة الصوتية');}
+}
+function duaDone(){
+  lset(K_READ,todaySerial());
+  closeDua();
+  toast('تقبّل الله طاعتك — تم تسجيل قراءة الدعاء لهذه الليلة');
+}
+
+/* ============ جدولة التذكير ============ */
+/* فحص أساسي: إن كان اليوم يوم عمل وكانت الساعة ٤:٣٠ أو بعدها ولم يُذكَّر اليوم → إشعار + نافذة */
+function checkDuaHard(){
+  renderDuaBar();
+  const s=todaySerial();
+  if(!isWorkDay(s)||!pastDuaTime())return;
+  if(lnum(K_NOTIFIED)===s)return;
+  lset(K_NOTIFIED,s);
+  notifyDua();
+  openDua();
+}
+/* التقاط متأخر: إن كان قد أُرسل الإشعار سابقاً لكن دون «تم القراءة» → أعِد فتح النافذة */
+function duaCatchUp(){
+  const s=todaySerial();
+  if(!isWorkDay(s)||!pastDuaTime())return;
+  if(lnum(K_NOTIFIED)===s&&lnum(K_READ)!==s)openDua();
+}
+
+/* ============ ربط الأحداث ============ */
+editBtn.addEventListener('click',()=>editing?stopEdit():startEdit());
+cancelBtn.addEventListener('click',stopEdit);
+resetBtn.addEventListener('click',()=>{
+  state=DEFAULT();save();stopEdit();renderAll(true);
+  toast('استُعيد التقويم الافتراضي — بداية العمل: الخميس ١ أكتوبر ٢٠٢٦');
+});
+monthsEl.addEventListener('click',e=>{
+  const b=e.target.closest('.cell');
+  if(!b||b.classList.contains('empty')||!editing)return;
+  const s=+b.dataset.s;
+  const i=picked.indexOf(s);
+  if(i>-1)picked.splice(i,1);else picked.push(s);
+  updatePcount();
+  if(picked.length===3)finishPick();
+  else renderMonths(false);
+});
+function updatePcount(){pcountEl.textContent=arNum(picked.length)+' / ٣';}
+function startEdit(){
+  editing=true;picked=[];
+  editBar.hidden=false;
+  editBtn.textContent='إلغاء التعديل';
+  updatePcount();
+  renderMonths(false);renderSummary();
+}
+function stopEdit(){
+  editing=false;picked=[];
+  editBar.hidden=true;
+  editBtn.innerHTML=BTN_HTML;
+  renderMonths(false);renderSummary();
+}
+function finishPick(){
+  picked.sort((a,b)=>a-b);
+  const baseS=picked[0];
+  const offsets=[...new Set(picked.map(p=>mod6(p-baseS)))].sort((a,b)=>a-b);
+  state={base:fromSerial(baseS),offsets};
+  save();
+  const consecutive=picked[1]-picked[0]===1&&picked[2]-picked[1]===1;
+  editing=false;picked=[];
+  editBar.hidden=true;
+  editBtn.innerHTML=BTN_HTML;
+  renderAll(true);
+  toast(consecutive?'تم إعادة حساب أيام العمل والإجازة لكامل التقويم — وتحدّث موعد تذكير الدعاء تلقائياً':'تم الحفظ — انتبه: أيام العمل التي اخترتها غير متتالية');
+}
+
+duaBtn.addEventListener('click',openDua);
+duaX.addEventListener('click',closeDua);
+duaDone.addEventListener('click',duaDone);
+duaSpeak.addEventListener('click',speakDua);
+duaOverlay.addEventListener('click',e=>{if(e.target===duaOverlay)closeDua();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!duaOverlay.hidden)closeDua();});
+duaBarEl.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const a=b.dataset.act;
+  if(a==='enable'){
+    if(!('Notification' in window)){toast('متصفحك لا يدعم الإشعارات');return;}
+    Notification.requestPermission().then(()=>{
+      renderDuaBar();
+      if(Notification.permission==='granted'){toast('تم تفعيل الإشعارات — ستصلك التذكيرات ٤:٣٠ مساءً أيام العمل');notifyTest();}
+    });
+  }
+  if(a==='test')notifyTest();
+  if(a==='open')openDua();
+});
+
+function renderAll(wave){
+  renderMonths(wave);renderSummary();renderToday();renderFoot();renderDuaBar();updateDuaBtn();
+  if(wave)setTimeout(()=>{
+    document.querySelectorAll('#months .cell').forEach(c=>c.style.transitionDelay='');
+    monthsEl.classList.remove('wave');
+  },1100);
+}
+
+/* ============ التشغيل ============ */
+buildDuaBody();
+renderAll(false);
+duaCatchUp();                 /* لو فتحت التطبيق بعد ٤:٣٠ في ليلة عمل ولم تقرأ الدعاء */
+setTimeout(checkDuaHard,600); /* التقاط أول تشغيل */
+setInterval(checkDuaHard,20000); /* فحص كل ٢٠ ثانية — يلتقط ٤:٣۰ مساء في وقته */
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){duaCatchUp();renderDuaBar();}});
+
+/* تحديث تلقائي عند تبدّل اليوم */
+let lastKey=(()=>{const T=todayParts();return T.y+'-'+T.m+'-'+T.d;})();
+setInterval(()=>{
+  const T=todayParts(),k=T.y+'-'+T.m+'-'+T.d;
+  if(k!==lastKey){lastKey=k;renderAll(false);}
+},30000);
+</script>
+</body>
+</html>
